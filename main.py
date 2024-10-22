@@ -33,9 +33,9 @@ def main():
             frame_count += 1
             calculate_fps(frame_count, fps_display_interval, fps_last_update_time)
 
-        if cv2.waitKey(1) & 0xFF == ord('q'):
-            cv2.destroyAllWindows()
-            break
+        cv2.waitKey(1)
+    cv2.destroyAllWindows()
+
 
 
 def getdistance(angle):
@@ -95,20 +95,18 @@ def getradian(screencoordinates):
         cv2.imshow("Monochrome Screen Capture", img_monochrome)
         value = reader.readtext(img_monochrome, allowlist="0,1,2,3,4,5,6,7,8,9", mag_ratio=2, text_threshold=0.80,
                                 low_text=0.2, link_threshold=0.2)
-        #check if value is divisible by 50 as it is height > 25 usually 37
 
-        #first check if the height of the first point (top left) is less than half of the total height of screen coordinate
+        # check if value is divisible by 50 as it is height > 25 usually 37
 
+        # first check if the height of the first point (top left) is less than half of the total height of screen coordinate
 
         for item in value:
             number = int(item[1])
             if number % 50 == 0:
                 big = True
-                #early return
+                # early return
             if item[0][0][1] == 0:
                 big = False
-
-
 
         if debug:
             if value:
@@ -116,14 +114,6 @@ def getradian(screencoordinates):
                 for item in value:
                     points = numpy.array([item[0][0], item[0][1], item[0][2], item[0][3]],
                                          dtype=numpy.float32)
-                    #height
-                    # boxheight =  item[0][3][1] - item[0][0][1]
-                    # print(f"box #{boxnumber} height: {boxheight}")
-
-                    print(f"box #{boxnumber} y-axis: {item[0][3][1]}")
-
-
-
 
                     # Get the minimum area rectangle
                     rect = cv2.minAreaRect(points)
