@@ -40,11 +40,11 @@ def main():
 class FireSolution:
     # initialization
     velocity_squared = 12100  # velocity squared of mortar we should add more for other input
-    gravity = 0.1020408  # for multiplication
+    gravity = 0.1022495  # for multiplication
     screen_resolution = (1920, 1080)
     bearing_screen_coordinates = {"top": 1050, "left": 940, "width": 41, "height": 16}
-    radian_screen_coordinates = {"top": int(screen_resolution[1] / 2 - 100 / 2),
-                                 "left": 530, "width": 60, "height": 110}
+    natomil_screen_coordinates = {"top": int(screen_resolution[1] / 2 - 100 / 2),
+                                  "left": 530, "width": 60, "height": 110}
 
     # value[1] for the second number only if detected
     # value[x][0] list of coordinates starting from index[0] = top left and proceeding clockwise
@@ -66,36 +66,45 @@ class FireSolution:
         if debug:
             print("Getting Radian")
         # Variables for radians
-        self.radian_monochrome = None
-        self.radian_results = None
+        self.natomil_monochrome = None
+        self.natomil_results = None
         self.box_height = [0, 0]
         self.box_position = [0, 0]
         self.box_difference = None
-        self.pixel_per_mills = 5
+        self.pixel_per_natomil = 5
 
         while True:
-            self.radian = self.get_radian()
-            if self.radian:
-                print(f"Radian is: {self.radian}")
+            self.mil = self.get_natomil()
+            if self.mil:
+                print(f"NATO mil is: {self.mil}")
                 break
 
     def get_distance(self):
-        bearing = self.get_bearing()
-        radian = self.get_radian() * 0.001
-        distance = self.velocity_squared * numpy.sin(radian * 2) * self.gravity
+        # NATO mil to radian
+        # https://en.wikipedia.org/wiki/Milliradian
+        # 1 milliradian = 1.018592 NATO mil
+        # 1 NATO mil = 0.981719 milliradian
+        # edit distance so that we can create height map
+        # then create our own parabola and find intersection between heigh map and parabola
+        nato_mil = self.get_natomil()
+        if nato_mil:
+            radian = nato_mil * 0.981719 * 0.001
+            distance = self.velocity_squared * numpy.sin(radian * 2) * self.gravity
+
+        else:
+            distance = 0
         print(f"distance is: {distance}m")
 
-    def get_radian_ocr_results(self):  # this will return easyocr results for radian
-        # we should follow get_bearing_ocr_results for consistency
+    def get_natomil_ocr_results(self):  # this will return easyocr results for mil
         with mss.mss() as sct:
-            screenshot = sct.grab(self.radian_screen_coordinates)
+            screenshot = sct.grab(self.natomil_screen_coordinates)
             img = numpy.asarray(screenshot, dtype=numpy.uint8)
             img_gray = cv2.cvtColor(img, cv2.COLOR_BGRA2GRAY)
             cv2.imshow("Radian Gray Screen Capture", img_gray)
-            (thresh, self.radian_monochrome) = cv2.threshold(img_gray, 140, 255, cv2.THRESH_BINARY)
-            cv2.imshow("Radian Monochrome Screen Capture", self.radian_monochrome)
+            (thresh, self.natomil_monochrome) = cv2.threshold(img_gray, 140, 255, cv2.THRESH_BINARY)
+            cv2.imshow("Radian Monochrome Screen Capture", self.natomil_monochrome)
 
-            return reader.readtext(self.radian_monochrome, allowlist="0123456789", mag_ratio=2, text_threshold=0.80,
+            return reader.readtext(self.natomil_monochrome, allowlist="0123456789", mag_ratio=2, text_threshold=0.80,
                                    low_text=0.2, link_threshold=0.2)
 
     def get_bearing_ocr_results(self):
@@ -108,17 +117,34 @@ class FireSolution:
 
             return reader.readtext(self.img_monochrome, allowlist=".0123456789", detail=0)
 
-    def get_radian(self):
+    def get_natomil(self):
 
-        self.radian_results = self.get_radian_ocr_results()
+        self.natomil_results = self.get_natomil_ocr_results()
 
-        if self.radian_results:
-            for index, number in enumerate(self.radian_results):
+        if self.natomil_results:
+            for index, number in enumerate(self.natomil_results):
+                # FOR DEBUG
+                if debug:
+                    if self.natomil_results:
+                        boxnumber = 1
+                        for item in self.natomil_results:
+                            points = numpy.array([item[0][0], item[0][1], item[0][2], item[0][3]],
+                                                 dtype=numpy.float32)
+                            # Get the minimum area rectangle
+                            rect = cv2.minAreaRect(points)
+
+                            # Get the four corner points of the rectangle
+                            box = cv2.boxPoints(rect)
+                            box = numpy.intp(box)  # Convert the points to integer
+                            cv2.polylines(self.natomil_monochrome, [box], isClosed=True, color=(0, 255, 0), thickness=2)
+                            cv2.imshow("Radian Boxed Monochrome Screen Capture", self.natomil_monochrome)
+                            boxnumber += 1
+
                 # compute box height
                 top_left_y_axis = number[0][0][1]
                 bot_left_y_axis = number[0][3][1]
-                screen_edge = self.radian_screen_coordinates["height"]
-                tolerance = 1  # number tolerance for pixel
+                screen_edge = self.natomil_screen_coordinates["height"]
+                tolerance = 1  # number tolerance for pixel not used
 
                 # check if the box is on edge or not
                 if top_left_y_axis != 0 and bot_left_y_axis != screen_edge:
@@ -130,36 +156,18 @@ class FireSolution:
 
                 if index == 1:
                     self.box_difference = self.box_position[1] - self.box_position[0]
-                    self.pixel_per_mills = self.box_difference * 0.1
+                    self.pixel_per_natomil = self.box_difference * 0.1
 
-                    # add a way to track if it jumping or not
                 if index == 0:
-                    radian = 0
-                    if number[2] >= 0.8:
-                        radian = int(number[1]) + int((self.box_position[0] - 50) / self.pixel_per_mills)
-                        # print(f"Radian is: {radian}")
+                    if number[2] >= 0.8: # if it goes to 800 it no longer goes over 0.8 confidence
+                        natomil = int(number[1]) + int((self.box_position[0] - 50) / self.pixel_per_natomil)
+                        print(f"NATO mil is: {natomil}")
 
-            if debug:
-                if self.radian_results:
-                    boxnumber = 1
-                    for item in self.radian_results:
-                        points = numpy.array([item[0][0], item[0][1], item[0][2], item[0][3]],
-                                             dtype=numpy.float32)
-                        # Get the minimum area rectangle
-                        rect = cv2.minAreaRect(points)
-
-                        # Get the four corner points of the rectangle
-                        box = cv2.boxPoints(rect)
-                        box = numpy.intp(box)  # Convert the points to integer
-                        cv2.polylines(self.radian_monochrome, [box], isClosed=True, color=(0, 255, 0), thickness=2)
-                        cv2.imshow("Radian Boxed Monochrome Screen Capture", self.radian_monochrome)
-                        boxnumber += 1
-
-                # this should return the approximate radian calculated from the pixel difference and the radian detected
-            if radian:
-                return radian
-            else:
-                return 0
+                            # this should return the approximate mil calculated from the pixel difference and the mil detected
+                        if natomil:
+                            return natomil
+                        else:
+                            return 0
 
     def get_bearing(self):
         return self.get_bearing_ocr_results()
@@ -178,4 +186,5 @@ def calculate_fps(frame_count, fps_display_interval, last_time):
         return last_time, frame_count
 
 
-main()
+if __name__ == "__main__":
+    main()
