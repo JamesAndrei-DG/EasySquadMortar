@@ -3,5 +3,5 @@
   <component name="Black">
     <option name="sdkName" value="SquadMortar" />
   </component>
-  <component name="ProjectRootManager" version="2" project-jdk-name="SquadMortar" project-jdk-type="Python SDK" />
+  <component name="ProjectRootManager" version="2" project-jdk-name="EasySquadMortar" project-jdk-type="Python SDK" />
 </project>

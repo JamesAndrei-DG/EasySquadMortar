@@ -1,0 +1,46 @@
+import QtQuick
+import QtQuick.Layouts
+import QtQuick.Controls
+import QtQuick.Window
+
+Window {
+    visible: true
+    width: 200
+    height: 100
+    flags: Qt.Tool | Qt.WindowStaysOnTopHint   // Ensure the window stays on top
+    color: "transparent"  // Makes the window background transparent if desired
+
+    Rectangle {
+        width: 200
+        height: 100
+        color: "lightgrey"
+        radius: 10
+        border.color: "black"
+
+        Text {
+            anchors.centerIn: parent
+            text: "Overlay Menu Example"
+            color: "black"
+        }
+
+        MouseArea {
+            anchors.fill: parent
+            onClicked: overlayMenu.open()
+        }
+    }
+
+    Menu {
+        id: overlayMenu
+        title: "Overlay Options"
+
+        MenuItem {
+            text: "Option 1"
+            onTriggered: console.log("Option 1 selected")
+        }
+        MenuItem {
+            text: "Option 2"
+            onTriggered: console.log("Option 2 selected")
+        }
+
+    }
+}

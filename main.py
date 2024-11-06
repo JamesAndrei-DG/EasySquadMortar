@@ -20,21 +20,19 @@ fps_last_update_time = time.time()
 
 
 def main():
-    # Add Exit
-
-    fire_solution = FireSolution()
-    while True:
-
-        fire_solution.get_distance()
-        if debug:
-            global frame_count
-            global fps_display_interval
-            global fps_last_update_time
-            frame_count += 1
-            calculate_fps(frame_count, fps_display_interval, fps_last_update_time)
-
-        cv2.waitKey(1)  # do i need this?
-    cv2.destroyAllWindows()
+    # fire_solution = FireSolution()
+    # while True:
+    #
+    #     if debug:
+    #         global frame_count
+    #         global fps_display_interval
+    #         global fps_last_update_time
+    #         frame_count += 1
+    #         calculate_fps(frame_count, fps_display_interval, fps_last_update_time)
+    #
+    #     cv2.waitKey(1)  # do i need this?
+    # cv2.destroyAllWindows()
+    pass
 
 
 class FireSolution:
@@ -159,11 +157,11 @@ class FireSolution:
                     self.pixel_per_natomil = self.box_difference * 0.1
 
                 if index == 0:
-                    if number[2] >= 0.8: # if it goes to 800 it no longer goes over 0.8 confidence
+                    if number[2] >= 0.8:  # if it goes to 800 it no longer goes over 0.8 confidence
                         natomil = int(number[1]) + int((self.box_position[0] - 50) / self.pixel_per_natomil)
                         print(f"NATO mil is: {natomil}")
 
-                            # this should return the approximate mil calculated from the pixel difference and the mil detected
+                        # this should return the approximate mil calculated from the pixel difference and the mil detected
                         if natomil:
                             return natomil
                         else:
