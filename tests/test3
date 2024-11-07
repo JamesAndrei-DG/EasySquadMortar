@@ -3,44 +3,58 @@ import QtQuick.Layouts
 import QtQuick.Controls
 import QtQuick.Window
 
+QtQuickControls2::Style {
+    // Available options: "Material", "Fusion", "Imagine", "Universal", etc.
+    name: "Material"  // Change to "Fusion" or others if needed
+}
+
 Window {
+    id: mainWindow
+
+    color: "transparent"
+    flags: Qt.WindowStaysOnTopHint | Qt.FramelessWindowHint
+    height: 100
     visible: true
     width: 200
-    height: 100
-    flags: Qt.Tool | Qt.WindowStaysOnTopHint   // Ensure the window stays on top
-    color: "transparent"  // Makes the window background transparent if desired
+
+    palette {
+        window: "black"
+        text: "white"
+    }
+
 
     Rectangle {
-        width: 200
-        height: 100
-        color: "lightgrey"
-        radius: 10
         border.color: "black"
+        color: "lightgrey"
+        height: 100
+        radius: 10
+        width: 200
 
         Text {
             anchors.centerIn: parent
-            text: "Overlay Menu Example"
             color: "black"
+            text: "Overlay Menu Example"
         }
-
         MouseArea {
             anchors.fill: parent
+
             onClicked: overlayMenu.open()
         }
     }
-
     Menu {
         id: overlayMenu
+
         title: "Overlay Options"
 
         MenuItem {
             text: "Option 1"
+
             onTriggered: console.log("Option 1 selected")
         }
         MenuItem {
             text: "Option 2"
+
             onTriggered: console.log("Option 2 selected")
         }
-
     }
 }

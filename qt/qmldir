@@ -1,0 +1,5 @@
+module qt
+
+homescreen 1.0 screen/homescreen.qml
+
+

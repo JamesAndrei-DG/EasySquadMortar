@@ -7,8 +7,8 @@ Window {
     visible: true
     width: 200
     height: 100
-    flags: Qt.Tool | Qt.WindowStaysOnTopHint   // Ensure the window stays on top
-    color: "transparent"  // Makes the window background transparent if desired
+    flags: Qt.Tool | Qt.WindowStaysOnTopHint
+    color: "transparent"
 
     Rectangle {
         width: 200
