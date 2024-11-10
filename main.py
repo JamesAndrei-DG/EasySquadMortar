@@ -20,18 +20,19 @@ fps_last_update_time = time.time()
 
 
 def main():
-    # fire_solution = FireSolution()
-    # while True:
-    #
-    #     if debug:
-    #         global frame_count
-    #         global fps_display_interval
-    #         global fps_last_update_time
-    #         frame_count += 1
-    #         calculate_fps(frame_count, fps_display_interval, fps_last_update_time)
-    #
-    #     cv2.waitKey(1)  # do i need this?
-    # cv2.destroyAllWindows()
+    fire_solution = FireSolution()
+    while True:
+        # fire_solution.get_distance()
+
+        if debug:
+            global frame_count
+            global fps_display_interval
+            global fps_last_update_time
+            frame_count += 1
+            calculate_fps(frame_count, fps_display_interval, fps_last_update_time)
+
+        cv2.waitKey(1)
+    cv2.destroyAllWindows()
     pass
 
 
@@ -135,7 +136,7 @@ class FireSolution:
                             box = cv2.boxPoints(rect)
                             box = numpy.intp(box)  # Convert the points to integer
                             cv2.polylines(self.natomil_monochrome, [box], isClosed=True, color=(0, 255, 0), thickness=2)
-                            cv2.imshow("Radian Boxed Monochrome Screen Capture", self.natomil_monochrome)
+                            # cv2.imshow("Radian Boxed Monochrome Screen Capture", self.natomil_monochrome)
                             boxnumber += 1
 
                 # compute box height
