@@ -4,43 +4,66 @@ import QtQuick.Controls
 import QtQuick.Window
 
 Window {
+    id: mainWindow
+
+    color: "white"
+    flags: Qt.WindowStaysOnTopHint | Qt.FramelessWindowHint
+    height: 650
     visible: true
-    width: 200
-    height: 100
-    flags: Qt.Tool | Qt.WindowStaysOnTopHint
-    color: "transparent"
+    width: 1050
 
     Rectangle {
-        width: 200
-        height: 100
-        color: "lightgrey"
-        radius: 10
         border.color: "black"
+        color: "grey"
+        height: 100
+        radius: 10
+        width: 200
+        anchors.top: parent.top
+        anchors.right: parent.right
 
         Text {
             anchors.centerIn: parent
-            text: "Overlay Menu Example"
-            color: "black"
+            color: "white"
+            text: "Logo PlaceHolder"
         }
-
         MouseArea {
             anchors.fill: parent
-            onClicked: overlayMenu.open()
-        }
-    }
+            acceptedButtons: Qt.LeftButton | Qt.RightButton
+            property point dragStartPosition
 
-    Menu {
-        id: overlayMenu
-        title: "Overlay Options"
+            onClicked: {
+                if (mouse.button === Qt.RightButton) { // 'mouse' is a MouseEvent argument passed into the onClicked signal handler
+                    overlayMenu.popup()
+                } else if (mouse.button === Qt.LeftButton) {
+                    dragStartPosition = Qt.point(mouse.x, mouse.y)
 
-        MenuItem {
-            text: "Option 1"
-            onTriggered: console.log("Option 1 selected")
-        }
-        MenuItem {
-            text: "Option 2"
-            onTriggered: console.log("Option 2 selected")
-        }
 
+                }
+            }
+            onPositionChanged: function(mouse) {
+                if (mouse.buttons & Qt.LeftButton) { // Check if the left mouse button is still pressed
+                    var dx = mouse.x - dragStartPosition.x
+                    var dy = mouse.y - dragStartPosition.y
+                    mainWindow.x += dx
+                    mainWindow.y += dy
+                }
+            }
+        }
+        Menu {
+            id: overlayMenu
+
+            title: "Overlay Options"
+
+            MenuItem {
+                text: "Default"
+
+                onTriggered: console.log("Option 1 selected")
+            }
+            MenuItem {
+                text: "Debug"
+
+                onTriggered: console.log("Option 2 selected")
+            }
+        }
     }
 }

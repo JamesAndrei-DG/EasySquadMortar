@@ -1,5 +1,5 @@
 module qt
 
-homescreen 1.0 screen/homescreen.qml
-
-
+main 1.0 screen/main.qml
+default 1.0 screen/default.qml
+splash 1.0 screen/splash.qml
