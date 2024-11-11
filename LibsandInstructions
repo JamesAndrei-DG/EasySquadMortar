@@ -1,20 +1,21 @@
-conda install numpy opencv python=3.12 qt6-main=3.8.0
+conda install python=3.11 easyocr=1.7.0 folium=0.18.0 numpy opencv pyside6    #check if pyside6 version latest
+pyside6 is 6.7.3
 
 pip install
 
 mss
-easyocr
-pyside6
-pyside6-addons
+pyside6-addons #not needed? 
 folium
 
 
 # ***** Error #15: Initializing libiomp5md.dll, but found libiomp5md.dll already initialized.
+# Try to setup all libraries in conda env than pip
 # https://stackoverflow.com/a/69084316
 # I tried manually deleting the old libiomp5md.dll file. This file is in your anaconda3/lib directory. You should remove the old libiomp5.dll file. Then it should work.
 # file is in your anaconda3/envs/XXX/Library/bin folder where XXX is your env name or just anaconda3/Library/bin if not in an en
 
-# ***** if qt could not be initialized follow this instruction https://stackoverflow.com/a/52281936
+# ***** This application failed to start because no Qt platform plugin could be initialized. Reinstalling the application may fix this problem.
+# follow this instruction https://stackoverflow.com/a/52281936
 # If you are running PyQt5 and PySide2, this solved the problem for me:
 #
 # Copy the following files:
