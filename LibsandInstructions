@@ -1,11 +1,16 @@
-conda install python=3.11 easyocr=1.7.0 folium=0.18.0 numpy opencv pyside6    #check if pyside6 version latest
-pyside6 is 6.7.3
+conda create --name EasySquadMortar python=3.11 #conda env setting
+#**for conda if ever something changed** easyocr=1.7.0 folium=0.18.0 numpy opencv pyside6  
+#py-opencv or is it opencv-python?
+
 
 pip install
 
 mss
-pyside6-addons #not needed? 
-folium
+easyocr==1.7.2
+folium==0.18.0
+numpy==2.1.3
+opencv-python==4.10.0.84
+pyside6==6.8.0.2
 
 
 # ***** Error #15: Initializing libiomp5md.dll, but found libiomp5md.dll already initialized.

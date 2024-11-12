@@ -10,10 +10,6 @@ from PySide6.QtCore import Qt
 
 
 
-
-
-
-
 if __name__ == "__main__":
     #Initialization
     app = QGuiApplication(sys.argv)
