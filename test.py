@@ -1,42 +1,61 @@
-import sys
 import folium
-from PySide6.QtCore import QUrl
-from PySide6.QtWidgets import QApplication, QMainWindow, QVBoxLayout, QWidget
-from PySide6.QtWebEngineWidgets import QWebEngineView
+from folium.plugins import Realtime
+from branca.element import Element
 
-sys.setrecursionlimit(10000)
+# Create the map object
+m = folium.Map()
+m._name = "map"
+m._id = "1"
 
-class MapWindow(QMainWindow):
-    def __init__(self):
-        super().__init__()
+# JavaScript for the zoomonmarker function (separate and reusable)
+zoomonmarker_js = """
+function zoomonmarker(longitude, latitude) {
+    // Assuming 'map' is the Leaflet map object, accessible via window.map
 
-        # Create the Folium map
-        self.map = folium.Map(location=[51.5074, -0.1278], zoom_start=12)  # Coordinates for London
-        folium.Marker([51.5074, -0.1278], popup='London').add_to(self.map)
+    map_1.setView([latitude, longitude], 5);  // Set the center to the coordinates and zoom level to 12
+}
+"""
 
-        # Save the map to an HTML file
-        map_path = "simple_map.html"
-        self.map.save(map_path)
+# Inject the zoomonmarker function into the map's JavaScript environment
+m.get_root().script.add_child(Element(zoomonmarker_js))
 
-        # Set up the PySide6 WebEngine to display the map
-        self.browser = QWebEngineView()
-        self.browser.setUrl(QUrl.fromLocalFile(map_path))
+# JavaScript for fetching satellite data and calling zoomonmarker
+source = folium.JsCode("""
+    function(responseHandler, errorHandler) {
+        var url = 'https://api.wheretheiss.at/v1/satellites/25544';
+        
+        fetch(url)
+        .then((response) => {
+            return response.json().then((data) => {
+                var { id, longitude, latitude } = data;
 
-        # Set up the main window layout
-        layout = QVBoxLayout()
-        layout.addWidget(self.browser)
+                return {
+                    'type': 'FeatureCollection',
+                    'features': [{
+                        'type': 'Feature',
+                        'geometry': {
+                            'type': 'Point',
+                            'coordinates': [longitude, latitude]
+                        },
+                        'properties': {
+                            'id': id
+                        }
+                    }]
+                };
+            })
+        })
+        .then((data) => {
+            responseHandler(data);
+            // Call the zoomonmarker function here
+            zoomonmarker(data.features[0].geometry.coordinates[0], data.features[0].geometry.coordinates[1]);
+        })
+        .catch(errorHandler);
+    }
+""")
 
-        # Create a QWidget for the central widget
-        container = QWidget()
-        container.setLayout(layout)
-        self.setCentralWidget(container)
+# Add Realtime plugin to the map
+rt = Realtime(source, interval=10000)
+rt.add_to(m)
 
-        # Set window title and size
-        self.setWindowTitle("Folium Map in PySide6 Window")
-        self.setGeometry(100, 100, 800, 600)
-
-if __name__ == "__main__":
-    app = QApplication(sys.argv)
-    window = MapWindow()
-    window.show()
-    sys.exit(app.exec())
+# Save the map as an HTML file
+m.save("test.html")
