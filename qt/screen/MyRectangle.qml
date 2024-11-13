@@ -1,5 +1,6 @@
 import QtQuick 2.15
 import QtQuick.Window 2.15
+import QtWebEngine 1.7
 
 Window {
     visible: true
@@ -7,10 +8,9 @@ Window {
     height: 300
     title: "Red Rectangle Window"
 
-    Rectangle {
-        width: 200
-        height: 100
-        color: "red"
-        anchors.centerIn: parent
+    WebEngineView {
+        id: webViewContainer
+        anchors.fill: parent
+        url: Qt.resolvedUrl("test.html")
     }
 }

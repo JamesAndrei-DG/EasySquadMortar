@@ -1,23 +1,43 @@
+from offline_folium import offline
 import folium
+import jinja2
 from folium.plugins import Realtime
-from branca.element import Element
+
+
+
 
 # Create the map object
-m = folium.Map()
-m._name = "map"
-m._id = "1"
+Base_Map = folium.Map(crs='Simple', zoom_start=4)
+albasrah_overlay = folium.raster_layers.ImageOverlay(
+    image='albasrah.webp',
+    bounds=[[0,0], [-3040,3040]],
+    zigzag_index=1
+)
 
-# JavaScript for the zoomonmarker function (separate and reusable)
-zoomonmarker_js = """
-function zoomonmarker(longitude, latitude) {
-    // Assuming 'map' is the Leaflet map object, accessible via window.map
+albasrah_overlay.add_to(Base_Map)
+Base_Map.fit_bounds(bounds=[[0,0], [-3040,3040]])
 
-    map_1.setView([latitude, longitude], 5);  // Set the center to the coordinates and zoom level to 12
+#Set name for map so we can use javascript to manipulate.
+Base_Map._name = "map"
+Base_Map._id = "1"
+
+
+#Add Custom Javascript
+el = folium.MacroElement().add_to(Base_Map)
+el._template = jinja2.Template("""
+    {% macro script(this, kwargs) %}
+    // write JS here
+    function ZoomOnUpdate(longitude, latitude) {
+    map_1.setView([latitude, longitude], 2);  // Set the center to the coordinates and zoom level to 12
 }
-"""
+    {% endmacro %}
+""")
 
-# Inject the zoomonmarker function into the map's JavaScript environment
-m.get_root().script.add_child(Element(zoomonmarker_js))
+#custom javascript
+#https://stackoverflow.com/a/58802382
+
+#Base_Map.add_js_link("zoomonmark", "js/zoomonmark.js")
+
 
 # JavaScript for fetching satellite data and calling zoomonmarker
 source = folium.JsCode("""
@@ -46,8 +66,8 @@ source = folium.JsCode("""
         })
         .then((data) => {
             responseHandler(data);
-            // Call the zoomonmarker function here
-            zoomonmarker(data.features[0].geometry.coordinates[0], data.features[0].geometry.coordinates[1]);
+            // Call the ZoomOnUpdate function here
+            ZoomOnUpdate(data.features[0].geometry.coordinates[0], data.features[0].geometry.coordinates[1]);
         })
         .catch(errorHandler);
     }
@@ -55,7 +75,8 @@ source = folium.JsCode("""
 
 # Add Realtime plugin to the map
 rt = Realtime(source, interval=10000)
-rt.add_to(m)
+rt.add_to(Base_Map)
+
 
 # Save the map as an HTML file
-m.save("test.html")
+Base_Map.save("qt/screen/test.html")
