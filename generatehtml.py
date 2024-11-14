@@ -1,4 +1,3 @@
-from offline_folium import offline
 import folium
 import jinja2
 from folium.plugins import Realtime
@@ -36,10 +35,7 @@ el._template = jinja2.Template("""
 #custom javascript
 #https://stackoverflow.com/a/58802382
 
-#Base_Map.add_js_link("zoomonmark", "js/zoomonmark.js")
-
-
-# JavaScript for fetching satellite data and calling zoomonmarker
+# JavaScript for fetching satellite data and added zoomonmarker function call
 source = folium.JsCode("""
     function(responseHandler, errorHandler) {
         var url = 'https://api.wheretheiss.at/v1/satellites/25544';

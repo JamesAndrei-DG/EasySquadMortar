@@ -33,5 +33,6 @@ offline_folium
 
 # js: Uncaught ReferenceError: L is not defined
 # check if firewall is blocking
+# need to add javascriptEnabled and localContentCanAccessRemoteUrls to qml file or in python
 # or use offline_folium to add all js script
 # update offline_folium to get plugins for realtime
