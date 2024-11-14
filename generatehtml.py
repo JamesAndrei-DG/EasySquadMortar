@@ -1,13 +1,46 @@
 import folium
 import jinja2
 from folium.plugins import Realtime
+import re
 
+def parse_maps():
+    with open('./maps/maps.js', 'r') as file:
+        js_template = file.read()
+
+    name_pattern = r'name:\s*"([^"]*)"'
+    size_pattern = r'size:\s*(\d+)'
+    scaling_pattern = r'scaling:\s*([\d\.]+)'
+    mapURL_pattern = r'mapURL:\s*"([^"]*)"'
+    maxZoomLevel_pattern = r'maxZoomLevel:\s*(\d+)'
+
+    maps = []
+
+    name = re.findall(name_pattern, js_template)
+    size = re.findall(size_pattern, js_template)
+    scaling = re.findall(scaling_pattern, js_template)
+    mapURL = re.findall(mapURL_pattern, js_template)
+    maxZoomLevel = re.findall(maxZoomLevel_pattern, js_template)
+
+    for i in range(len(name)):
+        map_row = [
+            name[i],
+            int(size[i]),
+            float(scaling[i]),
+            mapURL[i],
+            int(maxZoomLevel[i])
+        ]
+        maps.append(map_row)
+
+    return maps
+
+
+maps_array = parse_maps()
 
 
 
 # Create the map object
 Base_Map = folium.Map(crs='Simple', zoom_start=4)
-albasrah_overlay = folium.raster_layers.ImageOverlay(
+map_overlay = folium.raster_layers.ImageOverlay(
     image='albasrah.webp',
     bounds=[[0,0], [-3040,3040]],
     zigzag_index=1
