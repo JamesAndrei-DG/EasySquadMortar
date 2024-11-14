@@ -7,7 +7,19 @@ import QtWebEngine
 Rectangle {
     width: parent.width
     height: parent.height
-    color: "blue"
+    color: "transparent"
+
+    WebEngineView {
+        id: webViewContainer
+        anchors.fill: parent
+        url: Qt.resolvedUrl("test.html")
+        opacity: 0.5
+
+        settings {
+            javascriptEnabled: true
+            localContentCanAccessRemoteUrls: true
+        }
+    }
 
 
 
@@ -54,6 +66,12 @@ Rectangle {
             }
 
             Menu{
+                id: overlayMenu
+
+                MenuItem{
+                    text: "Exit"
+                    onTriggered: Qt.quit()
+                }
 
             }
         }
