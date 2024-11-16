@@ -10,7 +10,7 @@ folium==0.18.0
 numpy==2.1.3
 opencv-python==4.10.0.84
 pyside6==6.8.0.2
-offline_folium
+"fastapi[standard]" = 0.115.5
 
 # ***** Error #15: Initializing libiomp5md.dll, but found libiomp5md.dll already initialized.
 # Try to setup all libraries in conda env than pip
