@@ -53,7 +53,7 @@ for i, data in enumerate(maps_array):
     base_map._name = "map"
     base_map._id = "1"
 
-    # Add Custom Javascript
+    # Add Custom Javascript after map creation
     el = folium.MacroElement().add_to(base_map)
     el._template = jinja2.Template("""
         {% macro script(this, kwargs) %}
