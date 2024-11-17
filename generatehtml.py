@@ -53,8 +53,8 @@ for i, data in enumerate(maps_array):
     base_map._id = "1"
 
     # Add Custom Javascript Files
-    base_map.add_js_link("zoom-on-update", "/javascript/zoom-on-update.js")
-    base_map.add_js_link("GeoSSE", "/javascript/Leaflet.GeoSSE.min.js")
+    base_map.add_js_link("zoom-on-update", "./javascript/zoom-on-update.js")
+    base_map.add_js_link("GeoSSE", "./javascript/Leaflet.GeoSSE.min.js")
 
     # Custom Javascript
     # https://stackoverflow.com/a/58802382
