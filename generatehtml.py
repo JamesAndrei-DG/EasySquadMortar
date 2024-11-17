@@ -38,7 +38,6 @@ def parse_maps():
 maps_array = parse_maps()
 
 for i, data in enumerate(maps_array):
-    # Create the map object
     base_map = folium.Map(crs='Simple', zoom_start=4)
     map_overlay = folium.raster_layers.ImageOverlay(
         image=str("./maps" + data[3] + "basemap.webp"),
@@ -53,57 +52,26 @@ for i, data in enumerate(maps_array):
     base_map._name = "map"
     base_map._id = "1"
 
-    # Add Custom Javascript after map creation
-    el = folium.MacroElement().add_to(base_map)
-    el._template = jinja2.Template("""
-        {% macro script(this, kwargs) %}
-        // write JS here
-        function ZoomOnUpdate(longitude, latitude) {
-        map_1.setView([latitude, longitude], 2);  // Set the center to the coordinates and zoom level to 12
-    }
-        {% endmacro %}
-    """)
+    # Add Custom Javascript Files
+    base_map.add_js_link("zoom-on-update", "/javascript/zoom-on-update.js")
+    base_map.add_js_link("GeoSSE", "/javascript/Leaflet.GeoSSE.min.js")
 
-    # custom javascript
+    # Custom Javascript
     # https://stackoverflow.com/a/58802382
-
-    # JavaScript for fetching satellite data and added zoomonmarker function call
-    source = folium.JsCode("""
-        function(responseHandler, errorHandler) {
-            var url = 'https://api.wheretheiss.at/v1/satellites/25544';
+    javascript = folium.MacroElement().add_to(base_map)
+    javascript._template = jinja2.Template("""
+            {% macro script(this, kwargs) %}
             
-            fetch(url)
-            .then((response) => {
-                return response.json().then((data) => {
-                    var { id, longitude, latitude } = data;
-    
-                    return {
-                        'type': 'FeatureCollection',
-                        'features': [{
-                            'type': 'Feature',
-                            'geometry': {
-                                'type': 'Point',
-                                'coordinates': [longitude, latitude]
-                            },
-                            'properties': {
-                                'id': id
-                            }
-                        }]
-                    };
-                })
-            })
-            .then((data) => {
-                responseHandler(data);
-                // Call the ZoomOnUpdate function here
-                ZoomOnUpdate(data.features[0].geometry.coordinates[0], data.features[0].geometry.coordinates[1]);
-            })
-            .catch(errorHandler);
-        }
-    """)
-
-    # Add Realtime plugin to the map
-    rt = Realtime(source, interval=10000)
-    rt.add_to(base_map)
+            //SSE Client Setup
+            var geoSSELayer = L.geoSSE(null, {
+            streamUrl: "http://127.0.0.1:8000/impact-point",
+            featureIdField: "id",
+            });
+            map_1.addLayer(geoSSELayer);
+            geoSSELayer.connectToEventStream();
+            
+            {% endmacro %}
+        """)
 
     # Save the map as an HTML file
     base_map.save(str("qt/screen/maps/" + data[0] + ".html"))
