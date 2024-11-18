@@ -12,7 +12,7 @@ Rectangle {
     WebEngineView {
         id: webViewContainer
         anchors.fill: parent
-        url: Qt.resolvedUrl("test.html")
+        url: Qt.resolvedUrl("./maps/" + mapSelector.currentText.replace(" ", "") + ".html")
         opacity: 0.5
 
         settings {
@@ -22,9 +22,26 @@ Rectangle {
     }
 
 
+    ComboBox {
+        id: mapSelector
+        model: mapNameList
+        opacity: 0.5
+        anchors.bottom: parent.bottom
+        anchors.right: parent.right
+        currentIndex: 0
+        onActivated: mapSelected.selected_map(mapSelector.currentText)
+
+        Component.onCompleted: {
+            mapSelector.popup.contentItem.implicitHeight = Qt.binding(function() {
+                return Math.min(250, mapSelector.popup.contentItem.contentHeight);
+            });
+        }
+
+    }
+
 
     Rectangle {
-        id: logobutton
+        id: logoButton
         border.color: "black"
         color: "grey"
         height: 100
@@ -32,7 +49,6 @@ Rectangle {
         width: 200
         anchors.top: parent.top
         anchors.right: parent.right
-
 
 
         Text {
@@ -65,10 +81,10 @@ Rectangle {
                 }
             }
 
-            Menu{
+            Menu {
                 id: overlayMenu
 
-                MenuItem{
+                MenuItem {
                     text: "Exit"
                     onTriggered: Qt.quit()
                 }
