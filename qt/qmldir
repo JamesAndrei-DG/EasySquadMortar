@@ -1,5 +1,6 @@
 module qt
 
-main 1.0 screen/main.qml
+app 1.0 screen/app.qml
 default 1.0 screen/default.qml
 splash 1.0 screen/splash.qml
+map 1.0 screen/map.qml

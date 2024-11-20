@@ -32,6 +32,10 @@ class maps(QObject):
     def selected_map(self, message:str):
         print(f"Selected map is: {message}")
 
+    @Slot(str)
+    def origin_point(self, location:str):
+        print(f"Origin is: {location}")
+
 if __name__ == "__main__":
 
     # Initialization
@@ -47,7 +51,7 @@ if __name__ == "__main__":
 
     # Load Qml
     engine.addImportPath(os.path.join(os.path.dirname(__file__), "qt"))
-    engine.load((QUrl("qt/screen/main.qml")))
+    engine.load((QUrl("qt/screen/app.qml")))
 
     if not engine.rootObjects():
         sys.exit(-1)
