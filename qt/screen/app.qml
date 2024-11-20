@@ -16,44 +16,6 @@ ApplicationWindow {
         enabled: false
     }
 
-    Window {
-        id: secondWindow
-        width: 400
-        height: 300
-        title: "Second Window"
-        color: "transparent"
-        visible: true
-
-        Item {
-            width: parent.width
-            height: parent.height
-
-            Loader {
-                id: mapLoader
-                anchors.fill: parent
-                source: "map.qml"
-            }
-
-            MouseArea {
-                anchors.fill: parent
-                enabled: false
-            }
-        }
-
-        // Initially set the position of second window relative to the main window
-        x: mainWindow.x + 50  // Offset position if needed
-        y: mainWindow.y + 50  // Offset position if needed
-    }
-
-    // Update position of second window whenever the main window moves
-    onXChanged: {
-        secondWindow.x = mainWindow.x + 50;  // Adjust the offset as needed
-    }
-
-    onYChanged: {
-        secondWindow.y = mainWindow.y + 50;  // Adjust the offset as needed
-    }
-
     StackView {
         id: stackView
         anchors.fill: parent

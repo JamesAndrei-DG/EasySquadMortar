@@ -8,15 +8,19 @@ Rectangle {
     width: parent.width
     height: parent.height
     color: "transparent"
-    MouseArea {
-        anchors.fill: parent
-        enabled: false
-    }
 
 
     //Load Map
+    Item {
+        width: parent.width
+        height: parent.height
 
-
+        Loader {
+            id: mapLoader
+            anchors.fill: parent
+            source: "map.qml"
+        }
+    }
 
 
     ColumnLayout {
@@ -45,6 +49,7 @@ Rectangle {
                     }
                 }
 
+
                 property string previousText: ""
                 property bool isValid: true
 
@@ -71,28 +76,23 @@ Rectangle {
                 }
             }
         }
+    }
 
-        property string selectedMap: "defaultMap" // Initial map selection
+    ComboBox {
+        id: mapSelector
+        model: mapNameList
+        opacity: 0.5
+        anchors.bottom: parent.bottom
+        anchors.right: parent.right
+        currentIndex: 0
+        onActivated: mapSelected.selected_map(mapSelector.currentText)
 
-        ComboBox {
-            id: mapSelector
-            model: mapNameList
-            opacity: 0.5
-            anchors.bottom: parent.bottom
-            anchors.right: parent.right
-            currentIndex: 0
-            onActivated: {
-                selectedMap = mapSelector.currentText  // Update selected map text
-                secondWindow.url = "file://" + Qt.resolvedUrl("./maps/" + selectedMap.replace(" ", "") + ".html") // Update second window URL dynamically
-            }
-
-            Component.onCompleted: {
-                mapSelector.popup.contentItem.implicitHeight = Qt.binding(function () {
-                    return Math.min(250, mapSelector.popup.contentItem.contentHeight);
-                });
-            }
-
+        Component.onCompleted: {
+            mapSelector.popup.contentItem.implicitHeight = Qt.binding(function () {
+                return Math.min(250, mapSelector.popup.contentItem.contentHeight);
+            });
         }
+
     }
 
 
