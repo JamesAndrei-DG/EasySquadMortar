@@ -2,53 +2,28 @@ import QtQuick
 import QtQuick.Layouts
 import QtQuick.Controls
 import QtQuick.Window
-import QtWebEngine
+
+import "components"
+
 
 ApplicationWindow {
     id: mainWindow
 
     color: "transparent"
     flags: Qt.WindowStaysOnTopHint | Qt.FramelessWindowHint
-    height: 650
-    width: 1050
+    height: 200 //650
+    width: 500 //1050
     visible: true
 
-    signal sendStringToWindow2(string message)
-
-
-    Window {
-        id: mapWindow
-        color: "white"
-        height: 650
-        width: 650
-        visible: true
-
-        property string map_selected: "AlBasrah"  // Default value
-
-        WebEngineView {
-            id: webViewContainer
-            anchors.fill: parent
-            url: Qt.resolvedUrl("./maps/" + mapWindow.map_selected.replace(" ", "") + ".html")
-            opacity: 0.5
-
-            settings {
-                javascriptEnabled: true
-                localContentCanAccessRemoteUrls: true
-            }
-        }
-        Connections {
-            target: mainWindow  // Connect to the signal of the main window
-            onSendStringToWindow2: {
-                // Update the map_selected property with the received message
-                mapWindow.map_selected = message
-            }
-        }
+    Mapwindow {
+        id:mapWindow
     }
+
 
     StackView {
         id: stackView
         anchors.fill: parent
-        initialItem: "splash.qml"
+        initialItem: "screen/splash.qml"
 
         replaceEnter: Transition {
             PropertyAnimation {
@@ -79,7 +54,7 @@ ApplicationWindow {
         repeat: false
 
         onTriggered: {
-            stackView.replace("default.qml")
+            stackView.replace("screen/main.qml")
 
             secondDelayTimer.start()
 

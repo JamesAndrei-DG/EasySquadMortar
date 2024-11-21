@@ -10,19 +10,6 @@ Rectangle {
     color: "transparent"
 
 
-    //Load Map
-    Item {
-        width: parent.width
-        height: parent.height
-
-        Loader {
-            id: mapLoader
-            anchors.fill: parent
-            source: "map.qml"
-        }
-    }
-
-
     ColumnLayout {
         spacing: 2
 
@@ -79,79 +66,34 @@ Rectangle {
     }
 
 
-
-
     ComboBox {
         id: mapSelector
-        model: mapNameList
+
+        model: map_name_list_py
         opacity: 0.5
         anchors.bottom: parent.bottom
         anchors.right: parent.right
         currentIndex: 0
+
+
         onActivated: {
-            mapSelected.selected_map(mapSelector.currentText);
-            mainWindow.sendStringToWindow2(mapSelector.currentText);
+            map_class_py.selected_map(mapSelector.currentText);
+            mapWindow.map_selected = mapSelector.currentText;
         }
 
         Component.onCompleted: {
+            mapWindow.map_selected = mapSelector.currentText;
+            map_class_py.selected_map(mapSelector.currentText);
             mapSelector.popup.contentItem.implicitHeight = Qt.binding(function () {
                 return Math.min(250, mapSelector.popup.contentItem.contentHeight);
             });
+
         }
 
     }
 
-
-    Rectangle {
+    Logobutton {
         id: logoButton
-        border.color: "black"
-        color: "grey"
-        height: 100
-        radius: 10
-        width: 200
-        anchors.top: parent.top
-        anchors.right: parent.right
-
-
-        Text {
-            anchors.centerIn: parent
-            color: "white"
-            text: "Logo PlaceHolder"
-        }
-        MouseArea {
-            anchors.fill: parent
-            acceptedButtons: Qt.LeftButton | Qt.RightButton
-            property point dragStartPosition
-
-            onPressed: {
-                if (mouse.button === Qt.RightButton) { // 'mouse' is a MouseEvent argument passed into the onClicked signal handler
-                    overlayMenu.popup()
-                } else if (mouse.button === Qt.LeftButton) {
-                    dragStartPosition = Qt.point(mouse.x, mouse.y)
-
-
-                }
-            }
-
-
-            onPositionChanged: function (mouse) {
-                if (mouse.buttons & Qt.LeftButton) { // Check if the left mouse button is still pressed
-                    var dx = mouse.x - dragStartPosition.x
-                    var dy = mouse.y - dragStartPosition.y
-                    mainWindow.x += dx
-                    mainWindow.y += dy
-                }
-            }
-
-            Menu {
-                id: overlayMenu
-
-                MenuItem {
-                    text: "Exit"
-                    onTriggered: Qt.quit()
-                }
-
-            }
-        }
     }
+
 }

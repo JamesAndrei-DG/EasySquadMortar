@@ -6,9 +6,9 @@ nasa.html
 
 # Folder
 tests/*
-qt/screen/maps/*
+qt/components/maps/*
 # Folder Exempt
-!qt/screen/maps/javascript/
+!qt/components/maps/javascript/
 
 ### PyCharm+all template
 # Covers JetBrains IDEs: IntelliJ, RubyMine, PhpStorm, AppCode, PyCharm, CLion, Android Studio, WebStorm and Rider

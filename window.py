@@ -44,14 +44,17 @@ if __name__ == "__main__":
 
     engine = QQmlApplicationEngine()
 
+
     # Map Class
     map = maps()
-    engine.rootContext().setContextProperty("mapNameList", map.get_map_name())
-    engine.rootContext().setContextProperty("mapSelected", map)
+    engine.rootContext().setContextProperty("map_name_list_py", map.get_map_name())
+    engine.rootContext().setContextProperty("map_class_py", map)
 
     # Load Qml
-    engine.addImportPath(os.path.join(os.path.dirname(__file__), "qt"))
-    engine.load((QUrl("qt/screen/app.qml")))
+
+
+    engine.load((QUrl("qt/root.qml")))
+
 
     if not engine.rootObjects():
         sys.exit(-1)

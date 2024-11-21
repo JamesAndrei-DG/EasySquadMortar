@@ -39,3 +39,6 @@ pyside6==6.8.0.2
 
 https://medium.com/@nandagopal05/server-sent-events-with-python-fastapi-f1960e0c8e4b
 #for fast api sse to client html
+
+#for qml imports
+https://stackoverflow.com/a/22170976

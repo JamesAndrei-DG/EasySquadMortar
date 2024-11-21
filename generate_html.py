@@ -42,4 +42,4 @@ for i, data in enumerate(maps_array):
         """)
 
     # Save the map as an HTML file
-    base_map.save(str("qt/screen/maps/" + data[0] + ".html"))
+    base_map.save(str("qt/components/maps/" + data[0] + ".html"))
