@@ -7,6 +7,11 @@ Window {
     height: 650
     width: 650
     visible: true
+    opacity: 0
+    flags: Qt.WindowTransparentForInput | Qt.FramelessWindowHint | Qt.WindowStaysOnTopHint
+
+
+
 
     property string map_selected: "AlBasrah"  // Default value
 

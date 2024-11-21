@@ -25,7 +25,8 @@ Rectangle {
 
         onPressed: {
             if (mouse.button === Qt.RightButton) { // 'mouse' is a MouseEvent argument passed into the onClicked signal handler
-                overlayMenu.popup()
+                overlayMenu.popup();
+                mainWindow.raise();
             } else if (mouse.button === Qt.LeftButton) {
                 dragStartPosition = Qt.point(mouse.x, mouse.y)
 
