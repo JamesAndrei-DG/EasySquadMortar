@@ -10,7 +10,8 @@ for i, data in enumerate(maps_array):
     map_overlay = folium.raster_layers.ImageOverlay(
         image=str("./maps" + data[3] + "basemap.webp"),
         bounds=[[0, 0], [-int(data[1]), int(data[1])]],
-        zigzag_index=1
+        zigzag_index=1,
+        zoom_control=False,
     )
 
     map_overlay.add_to(base_map)
