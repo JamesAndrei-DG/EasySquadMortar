@@ -78,6 +78,9 @@ Rectangle {
         }
     }
 
+
+
+
     ComboBox {
         id: mapSelector
         model: mapNameList
@@ -85,7 +88,10 @@ Rectangle {
         anchors.bottom: parent.bottom
         anchors.right: parent.right
         currentIndex: 0
-        onActivated: mapSelected.selected_map(mapSelector.currentText)
+        onActivated: {
+            mapSelected.selected_map(mapSelector.currentText);
+            mainWindow.sendStringToWindow2(mapSelector.currentText);
+        }
 
         Component.onCompleted: {
             mapSelector.popup.contentItem.implicitHeight = Qt.binding(function () {

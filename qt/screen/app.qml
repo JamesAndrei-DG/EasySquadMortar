@@ -2,6 +2,7 @@ import QtQuick
 import QtQuick.Layouts
 import QtQuick.Controls
 import QtQuick.Window
+import QtWebEngine
 
 ApplicationWindow {
     id: mainWindow
@@ -11,9 +12,37 @@ ApplicationWindow {
     height: 650
     width: 1050
     visible: true
-    MouseArea {
-        anchors.fill: parent
-        enabled: false
+
+    signal sendStringToWindow2(string message)
+
+
+    Window {
+        id: mapWindow
+        color: "white"
+        height: 650
+        width: 650
+        visible: true
+
+        property string map_selected: "AlBasrah"  // Default value
+
+        WebEngineView {
+            id: webViewContainer
+            anchors.fill: parent
+            url: Qt.resolvedUrl("./maps/" + mapWindow.map_selected.replace(" ", "") + ".html")
+            opacity: 0.5
+
+            settings {
+                javascriptEnabled: true
+                localContentCanAccessRemoteUrls: true
+            }
+        }
+        Connections {
+            target: mainWindow  // Connect to the signal of the main window
+            onSendStringToWindow2: {
+                // Update the map_selected property with the received message
+                mapWindow.map_selected = message
+            }
+        }
     }
 
     StackView {
