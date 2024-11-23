@@ -1,19 +1,18 @@
 import QtQuick
 import QtWebEngine
 
+
 Window {
     id: mapWindow
-    color: "white"
     height: 650
     width: 650
     visible: true
     opacity: 0
+    color: "white"
     flags: Qt.WindowTransparentForInput | Qt.FramelessWindowHint | Qt.WindowStaysOnTopHint
 
-
-
-
     property string map_selected: "AlBasrah"  // Default value
+
 
     WebEngineView {
         id: webViewContainer
@@ -26,4 +25,6 @@ Window {
             localContentCanAccessRemoteUrls: true
         }
     }
+
+
 }

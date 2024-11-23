@@ -13,16 +13,20 @@ Rectangle {
     ColumnLayout {
         spacing: 2
 
+
         Rectangle {
             Layout.preferredWidth: 50
             Layout.preferredHeight: 60
             color: "white"
+
+
             TextField {
                 id: textField
                 width: 300
                 height: 40
                 placeholderText: "Enter text (A + numbers)"
                 font.pixelSize: 16
+
 
                 onTextChanged: {
                     let validInput = isValidInput(text);
@@ -40,12 +44,13 @@ Rectangle {
                 property string previousText: ""
                 property bool isValid: true
 
+
                 function isValidInput(input) {
                     if (input.length === 0) return ""; // Allow empty input and return an empty string
-
                     // Ensure the first character is a letter and convert it to uppercase
                     let formattedInput = input[0].toUpperCase();
                     if (!/^[A-Za-z]$/.test(input[0])) return null; // Invalid if the first character is not a letter
+
 
                     // Process the remaining characters
                     for (let i = 1; i < input.length; i++) {
@@ -60,40 +65,22 @@ Rectangle {
                     }
 
                     return formattedInput; // Return the formatted valid input
+
+
                 }
             }
         }
     }
 
 
-    ComboBox {
+    Mapselector {
         id: mapSelector
-
-        model: map_name_list_py
-        opacity: 0.5
-        anchors.bottom: parent.bottom
-        anchors.right: parent.right
-        currentIndex: 0
-
-
-        onActivated: {
-            map_class_py.selected_map(mapSelector.currentText);
-            mapWindow.map_selected = mapSelector.currentText;
-        }
-
-        Component.onCompleted: {
-            mapWindow.map_selected = mapSelector.currentText;
-            map_class_py.selected_map(mapSelector.currentText);
-            mapSelector.popup.contentItem.implicitHeight = Qt.binding(function () {
-                return Math.min(250, mapSelector.popup.contentItem.contentHeight);
-            });
-
-        }
-
     }
+
 
     Logobutton {
         id: logoButton
     }
+
 
 }

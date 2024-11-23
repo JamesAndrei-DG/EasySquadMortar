@@ -1,5 +1,6 @@
 import QtQuick
 
+
 Rectangle {
     id: splash
     width: parent.width
@@ -13,4 +14,6 @@ Rectangle {
         font.pixelSize: 40
         color: "black"
     }
+
+
 }
