@@ -35,45 +35,11 @@ MenuItem {
                 font.pointSize: 10
                 font.bold: true
                 font.family: "Times New Roman"
-                property string previousText: ""
+                inputMask: ">A99-9-9-9-9; "
+                ToolTip.visible: hovered
+                ToolTip.text: "E01-9-5-3-3"
 
 
-                onTextChanged: {
-                    let validInput = isValid(text);
-                    if (validInput === null) {
-                        mortarPosition.text = previousText;
-                    } else {
-                        mortarPosition.text = validInput;
-                        previousText = validInput;
-                    }
-                }
-
-
-                function isValid(textinput) {
-                    if (textinput.length === 0) return ""; // Allow empty textinput and return an empty string
-                    if (textinput[0].match("[0-9]")) return null; // Invalid if the first character is not a letter
-
-                    let textfinal = textinput[0].toUpperCase();
-
-
-
-
-
-                    // Process the remaining characters
-                    for (let i = 1; i < textinput.length; i++) {
-                        if (!/^\d$/.test(textinput[i])) return null; // Invalid if not a number
-
-                        textfinal += textinput[i];
-
-                        // Add a dash every two numbers
-                        if ((i % 2 === 0) && (i < textinput.length - 1)) {
-                            textfinal += "-";
-                        }
-                    }
-
-                    return textfinal; // Return the formatted valid textinput
-
-                }
             }
 
 
@@ -81,7 +47,9 @@ MenuItem {
 
 
         onAccepted: {
-            map_class_py.origin_point(mortarPosition.text);
+
+
+            map_class_py.origin_point(mortarPosition.text.replace(/--+/g, ''));
         }
 
 
