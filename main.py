@@ -78,6 +78,38 @@ class FireSolution:
                 print(f"NATO mil is: {self.mil}")
                 break
 
+
+    def get_position(self, keypad):
+        keys = keypad.split("-")
+        x = 0
+        y = 0
+
+        for i, data in enumerate(keys):
+            if i == 0:
+                #Only works if it does not exceed letter z
+                lettertonumber = ord(data[0]) - 65
+                keypadnumber = int(data[1:3]) - 1
+
+                x = 300 * int(lettertonumber)
+                y = 300 * int(keypadnumber)
+
+            else:
+                data = int(data)
+                x_between = (data - 1) % 3
+                y_between = 2 - ((data - 1) // 3)
+                interval = 300 / 3 ** i
+
+                x += x_between * interval
+                y += y_between * interval
+
+        interval = 300 / 3 ** (len(keys) - 1)
+        x += interval / 2
+        y += interval / 2
+        print(f"x: {x}\ny: {y}")
+
+
+
+
     def get_distance(self):
         # NATO mil to radian
         # https://en.wikipedia.org/wiki/Milliradian
