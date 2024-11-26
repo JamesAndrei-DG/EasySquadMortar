@@ -1,7 +1,6 @@
 # File
 test.html
-test.py
-test[0-9]*.py
+test*.py
 nasa.html
 
 # Folder
