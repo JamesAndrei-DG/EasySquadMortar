@@ -108,16 +108,17 @@ class Heightmap:
 @timer_and_memory
 def for_heightmap(directory, size, scaling):
     heightmap = Heightmap("maps" + directory, size, scaling)
-    for x in range(0, 1000, 2):
-        heightmap.load_array()
-        heightmap.get_height_from_map((1000 + i), (1000 + i))
+    for x in range(0, 1200, 2):
+        for y in range(0, 1200, 2):
+            heightmap.get_height_from_map((10 + x), (10 + y))
 
 @timer_and_memory
 def for_array(directory, size, scaling):
     heightmap = Heightmap("maps" + directory, size, scaling)
-    for x in range(0, 1000, 2):
-        heightmap.load_array()
-        heightmap.get_height_from_array((1000 + i), (1000 + i))
+    heightmap.load_array()
+    for x in range(0, 1200, 2):
+        for y in range(0, 1200, 2):
+            heightmap.get_height_from_array((10 + x), (10 + y))
 
 
 for i, data in enumerate(maps_array):
