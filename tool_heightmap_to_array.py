@@ -2,6 +2,7 @@ import cv2
 import time
 import tracemalloc
 import numpy as np
+import pickle
 
 from tools import parse_maps
 
@@ -49,7 +50,8 @@ class Heightmap:
         self.scaling_height = scaling  # based on map Scaling attribute
 
         # print(f"height: {self.height}\nwidth: {self.width}")
-        self.array = np.zeros((int(size), int(size)), dtype=np.float16)  # array should be size of original map
+        # self.array = np.zeros((int(size), int(size)), dtype=np.float16)  # array should be size of original map
+        self.array = [[0 for x in range(size)] for y in range(size)]
 
         # buffer x and y
         self.buffer_x = 0
@@ -83,24 +85,32 @@ class Heightmap:
             self.buffer_height = height
             return height
 
-
+    @timer_and_memory
     def get_heightmap_to_array(self):
-        for x in range(self.array.shape[0]):
-            for y in range(self.array.shape[1]):
+        for x, column in enumerate(self.array):
+            for y,row in enumerate(column):
                 self.array[x][y] = self.get_height(x, y)
 
     def save_array(self):
-        np.save(str(self.dir + 'heightmap_array.npy'), self.array)
+        with open(str(self.dir + 'heightmap_array.pkl'), 'wb') as file:
+            pickle.dump(self.array, file)
 
     def load_array(self):
+        with open(str(self.dir + 'heightmap_array.pkl'), 'rb') as file:
+            self.array = pickle.load(file)
+
+    def save_array_np(self):
+        np.save(str(self.dir + 'heightmap_array.npy'), self.array)
+
+    def load_array_np(self):
         self.array = np.load(str(self.dir + 'heightmap_array.npy'))
 
-
+    # @timer_and_memory
     def get_height_from_array(self, x, y):
         height = self.array[x][y]
         # print(f"----array----\nheight @[{x}][{y}]: {self.array[x][y]}")
 
-
+    # @timer_and_memory
     def get_height_from_map(self, x, y):
         height = self.get_height(x, y)
         # print(f"----heightmap----\nheight @[{x}][{y}]: {height}")
@@ -109,15 +119,14 @@ class Heightmap:
 def for_heightmap(directory, size, scaling):
     heightmap = Heightmap("maps" + directory, size, scaling)
     for x in range(0, 1000, 2):
-        heightmap.load_array()
-        heightmap.get_height_from_map((1000 + i), (1000 + i))
+        heightmap.get_height_from_map((1000 + x), (1000 + x))
 
 @timer_and_memory
 def for_array(directory, size, scaling):
     heightmap = Heightmap("maps" + directory, size, scaling)
+    heightmap.load_array()
     for x in range(0, 1000, 2):
-        heightmap.load_array()
-        heightmap.get_height_from_array((1000 + i), (1000 + i))
+        heightmap.get_height_from_array((1000 + x), (1000 + x))
 
 
 for i, data in enumerate(maps_array):
