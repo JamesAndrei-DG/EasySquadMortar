@@ -83,7 +83,7 @@ class Heightmap:
             self.buffer_height = height
             return height
 
-    @timer_and_memory
+
     def get_heightmap_to_array(self):
         for x in range(self.array.shape[0]):
             for y in range(self.array.shape[1]):
@@ -95,26 +95,44 @@ class Heightmap:
     def load_array(self):
         self.array = np.load(str(self.dir + 'heightmap_array.npy'))
 
+
     def get_height_from_array(self, x, y):
-        print(f"array\nheight @[{x}][{y}]: {self.array[x][y]}")
+        height = self.array[x][y]
+        # print(f"----array----\nheight @[{x}][{y}]: {self.array[x][y]}")
+
 
     def get_height_from_map(self, x, y):
         height = self.get_height(x, y)
-        print(f"heightmap\nheight @[{x}][{y}]: {height}")
+        # print(f"----heightmap----\nheight @[{x}][{y}]: {height}")
 
-def manipulate_npy_array():
-    for i, data in enumerate(maps_array):
-        directory = data[3]
-        size = data[1]
-        scaling = data[2]
-
-        print(f"map: {data[0]}")
-        heightmap = Heightmap("maps" + directory, size, scaling)
-        # print(f"height: {heightmap.get_height(1500,1500)}\n\n")
-        # heightmap.get_heightmap_to_array()
-        # heightmap.save_array()
+@timer_and_memory
+def for_heightmap(directory, size, scaling):
+    heightmap = Heightmap("maps" + directory, size, scaling)
+    for x in range(0, 1000, 2):
         heightmap.load_array()
-        heightmap.get_height_from_array(1000,1000)
-        heightmap.get_height_from_map(1000,1000)
+        heightmap.get_height_from_map((1000 + i), (1000 + i))
 
-print("WTF")
+@timer_and_memory
+def for_array(directory, size, scaling):
+    heightmap = Heightmap("maps" + directory, size, scaling)
+    for x in range(0, 1000, 2):
+        heightmap.load_array()
+        heightmap.get_height_from_array((1000 + i), (1000 + i))
+
+
+for i, data in enumerate(maps_array):
+    directory = data[3]
+    size = data[1]
+    scaling = data[2]
+
+    print(f"map: {data[0]}")
+    for_heightmap(directory, size, scaling)
+    for_array(directory, size, scaling)
+
+    # heightmap = Heightmap("maps" + directory, size, scaling)
+    # print(f"height: {heightmap.get_height(1500,1500)}\n\n")
+    # heightmap.get_heightmap_to_array()
+    # heightmap.save_array()
+    # heightmap.load_array()
+    # heightmap.get_height_from_array(1000,1000)
+    # heightmap.get_height_from_map(1000,1000)
