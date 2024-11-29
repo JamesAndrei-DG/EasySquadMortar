@@ -2,6 +2,7 @@ import cv2
 import time
 import tracemalloc
 import numpy as np
+
 from tools import parse_maps
 
 maps_array = parse_maps.parse()
@@ -47,7 +48,7 @@ class Heightmap:
         self.scaling_xysizeratio = self.height / size  # heightmapsize / original size assuming map is square
         self.scaling_height = scaling  # based on map Scaling attribute
 
-        print(f"height: {self.height}\nwidth: {self.width}")
+        # print(f"height: {self.height}\nwidth: {self.width}")
         self.array = np.zeros((int(size), int(size)), dtype=np.float16)  # array should be size of original map
 
         # buffer x and y
@@ -91,6 +92,9 @@ class Heightmap:
     def save_array(self):
         np.save(str(self.dir + 'heightmap_array.npy'), self.array)
 
+    def load_array(self):
+        self.array = np.load(str(self.dir + 'heightmap_array.npy'))
+
     def get_height_from_array(self, x, y):
         print(f"array\nheight @[{x}][{y}]: {self.array[x][y]}")
 
@@ -98,17 +102,19 @@ class Heightmap:
         height = self.get_height(x, y)
         print(f"heightmap\nheight @[{x}][{y}]: {height}")
 
+def manipulate_npy_array():
+    for i, data in enumerate(maps_array):
+        directory = data[3]
+        size = data[1]
+        scaling = data[2]
 
-for i, data in enumerate(maps_array):
-    directory = data[3]
-    size = data[1]
-    scaling = data[2]
+        print(f"map: {data[0]}")
+        heightmap = Heightmap("maps" + directory, size, scaling)
+        # print(f"height: {heightmap.get_height(1500,1500)}\n\n")
+        # heightmap.get_heightmap_to_array()
+        # heightmap.save_array()
+        heightmap.load_array()
+        heightmap.get_height_from_array(1000,1000)
+        heightmap.get_height_from_map(1000,1000)
 
-    print(f"map: {data[0]}")
-    heightmap = Heightmap("maps" + directory, size, scaling)
-    # print(f"height: {heightmap.get_height(1500,1500)}\n\n")
-    heightmap.get_heightmap_to_array()
-    heightmap.save_array()
-    # heightmap.load_array()
-    # heightmap.get_height_from_array(2444,1500)
-    # heightmap.get_height_from_map(2444,1500)
+print("WTF")
