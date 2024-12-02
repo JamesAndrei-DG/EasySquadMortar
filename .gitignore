@@ -3,6 +3,9 @@ test.html
 test*.py
 nasa.html
 
+# File Exempt
+!testheightcircle.py
+
 # Folder
 tests/*
 qt/components/maps/*

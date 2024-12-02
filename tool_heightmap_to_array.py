@@ -105,6 +105,12 @@ class Heightmap:
         height = self.get_height(x, y)
         # print(f"----heightmap----\nheight @[{x}][{y}]: {height}")
 
+    def get_max_array(self):
+        return self.array.max(), self.array.argmax()
+
+    def get_min_array(self):
+        return self.array.min(), self.array.argmin()
+
 @timer_and_memory
 def for_heightmap(directory, size, scaling):
     heightmap = Heightmap("maps" + directory, size, scaling)
@@ -127,13 +133,17 @@ for i, data in enumerate(maps_array):
     scaling = data[2]
 
     print(f"map: {data[0]}")
-    for_heightmap(directory, size, scaling)
-    for_array(directory, size, scaling)
+    # for_heightmap(directory, size, scaling)
+    # for_array(directory, size, scaling)
 
-    # heightmap = Heightmap("maps" + directory, size, scaling)
+    heightmap = Heightmap("maps" + directory, size, scaling)
     # print(f"height: {heightmap.get_height(1500,1500)}\n\n")
     # heightmap.get_heightmap_to_array()
     # heightmap.save_array()
-    # heightmap.load_array()
+    heightmap.load_array()
+    max, maxarg = heightmap.get_max_array()
+    min, minarg = heightmap.get_min_array()
+    # print(f"max @ {maxarg}: {max}\nmin @ {minarg}: {min}")
+    print(type(heightmap.array[500][100]))
     # heightmap.get_height_from_array(1000,1000)
     # heightmap.get_height_from_map(1000,1000)
