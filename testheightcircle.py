@@ -231,7 +231,7 @@ class Heightmap:
 
         p = Pool()
         result = p.map(self.get_height_range_az, myrange)
-        # print(result)
+        print(result)
 
 
 @timer_and_memory
@@ -253,5 +253,5 @@ def getheight():
     heightmap.calculate_the_circle()
 
 
-
-getheight()
+if __name__ == '__main__':
+    getheight()
