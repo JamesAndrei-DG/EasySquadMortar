@@ -3,11 +3,7 @@ import cv2
 import numpy
 import easyocr
 import time
-
-try:
-    import Image
-except ImportError:
-    from PIL import Image
+from PIL import Image
 
 # EasyOCR Config
 reader = easyocr.Reader(['en'])
@@ -46,9 +42,9 @@ class FireSolution:
                                   "left": 530, "width": 60, "height": 110}
 
     # value[1] for the second number only if detected
-    # value[x][0] list of coordinates starting from index[0] = top left and proceeding clockwise
-    # value[x][1] Detected Number
-    # value[x][2] Probability
+    # value[origin_x][0] list of coordinates starting from index[0] = top left and proceeding clockwise
+    # value[origin_x][1] Detected Number
+    # value[origin_x][2] Probability
 
     def __init__(self):
         if debug:
