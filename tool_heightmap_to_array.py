@@ -5,7 +5,7 @@ import numpy as np
 
 from tools import parse_maps
 
-maps_array = parse_maps.parse()
+maps_array = parse_maps.parsemaps()
 
 
 def timer_and_memory(func):

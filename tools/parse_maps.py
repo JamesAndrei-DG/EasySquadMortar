@@ -1,6 +1,6 @@
 import re
 
-def parse():
+def parsemaps():
     with open('./maps/maps.js', 'r') as file:
         js_template = file.read()
 

@@ -20,7 +20,7 @@ class maps(QObject):
 
 
     def get_map_name(self):
-        map_data = parse_maps.parse()
+        map_data = parse_maps.parsemaps()
 
         for i, data in enumerate(map_data):
             self.map_names.append(data[0])
