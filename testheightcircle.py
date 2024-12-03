@@ -1,15 +1,14 @@
 import os
 import sys
-from concurrent.futures import ThreadPoolExecutor
-from multiprocessing.pool import ThreadPool
-from multiprocessing import Pool
 
 import cv2
 import time
 import tracemalloc
 import math
 import numpy as np
-import concurrent.futures
+from multiprocessing import Pool
+from scipy.optimize import curve_fit
+import matplotlib.pyplot
 
 
 def timer_and_memory(func):
@@ -36,8 +35,19 @@ def timer_and_memory(func):
         # Stop tracing memory
         tracemalloc.stop()
 
-        # Display results with high precision
-        print(f"Function '{func.__name__}' executed in {end_time - start_time:.10f} seconds.")
+        # Calculate elapsed time
+        elapsed_time = end_time - start_time
+
+        # Determine the appropriate time unit and format
+        if elapsed_time >= 1:
+            time_display = f"{elapsed_time:.10f} seconds"
+        elif elapsed_time >= 0.001:  # Between 1 millisecond and 1 second
+            time_display = f"{elapsed_time * 1000:.3f} milliseconds"
+        else:  # Less than 1 millisecond
+            time_display = f"{elapsed_time * 1_000_000:.3f} microseconds"
+
+        # Display results
+        print(f"Function '{func.__name__}' executed in {time_display}.")
         print(f"Current memory usage: {current / 1024:.2f} KB")
         print(f"Peak memory usage: {peak / 1024:.2f} KB")
 
@@ -231,7 +241,35 @@ class Heightmap:
 
         p = Pool()
         result = p.map(self.get_height_range_az, myrange)
-        print(result)
+        # print(result)
+
+    def test_get_height_range(self):
+        result = []
+        for natomil in range(800, 1580, 10):
+            result.append(self.get_distance((natomil * 0.981719 * 0.001), 10))
+
+    def test_get_distance_one(self):
+        self.get_distance((800 * 0.981719 * 0.001), 10)
+
+    def test_parabola_range(self):
+        azimuth = 10
+        y = self.get_height_line_array(azimuth)
+        x = np.arange(len(y))
+
+        params, covariance = curve_fit(self.quadratic_model, x, y)
+        a, b, c = params
+
+        height_function = self.quadratic_model(x, a, b, c)
+        matplotlib.pyplot.scatter(x, y, label="original Data", color='blue')
+        matplotlib.pyplot.plot(x, height_function, label='Fitted Curve', color='red')
+        matplotlib.pyplot.legend()
+        matplotlib.pyplot.xlabel('x')
+        matplotlib.pyplot.ylabel('y')
+        matplotlib.pyplot.title('Curve Fitting Example')
+        matplotlib.pyplot.show()
+
+    def quadratic_model(self, x, a, b, c):
+        return a * x ** 2 + b * x + c
 
 
 @timer_and_memory
@@ -250,7 +288,13 @@ def getheight():
 
     # print(f"size of all_height: {sys.getsizeof(all_height)}")
 
-    heightmap.calculate_the_circle()
+    # for multiprocessor
+    # heightmap.calculate_the_circle()
+
+    # heightmap.test_get_distance_one()
+    # heightmap.test_get_height_range()
+
+    heightmap.test_parabola_range()
 
 
 if __name__ == '__main__':
