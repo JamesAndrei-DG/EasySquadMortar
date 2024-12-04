@@ -12,12 +12,9 @@ from tools import parse_maps
 
 class maps(QObject):
 
-
     def __init__(self):
         QObject.__init__(self)
         self.map_names = []
-
-
 
     def get_map_name(self):
         map_data = parse_maps.parsemaps()
@@ -29,12 +26,13 @@ class maps(QObject):
         return self.map_names
 
     @Slot(str)
-    def selected_map(self, message:str):
+    def selected_map(self, message: str):
         print(f"Selected map is: {message}")
 
     @Slot(str)
-    def origin_point(self, location:str):
+    def origin_point(self, location: str):
         print(f"Origin is: {location}")
+
 
 if __name__ == "__main__":
 
@@ -44,7 +42,6 @@ if __name__ == "__main__":
 
     engine = QQmlApplicationEngine()
 
-
     # Map Class
     map = maps()
     engine.rootContext().setContextProperty("map_name_list_py", map.get_map_name())
@@ -52,9 +49,7 @@ if __name__ == "__main__":
 
     # Load Qml
 
-
     engine.load((QUrl("qt/root.qml")))
-
 
     if not engine.rootObjects():
         sys.exit(-1)

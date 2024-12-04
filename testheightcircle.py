@@ -69,7 +69,6 @@ class Heightmap:
         self.origin_y = 2000
         self.array_height = np.zeros((4617, 4617))
 
-        # initialize the array
 
     def get_height(self, find_x, find_y):
         # Adjust coordinates based on scaling
