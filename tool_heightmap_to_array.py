@@ -128,9 +128,7 @@ def for_array(directory, size, scaling):
         for y in range(0, 1200, 2):
             heightmap.get_height_from_array((10 + x), (10 + y))
 
-
-@timer_and_memory
-def run_me():
+def save_me():
     list_array = []
     for i, data in enumerate(maps_array):  # This will take a few minutes. will be faster if we use multiprocessing
         directory = data[3]
@@ -140,20 +138,44 @@ def run_me():
         print(f"map: {data[0]}")
 
         heightmap = Heightmap("maps" + directory, size, scaling)
-        # heightmap.get_heightmap_to_array()
-        # heightmap.save_array()
-
-        heightmap.load_array()
+        heightmap.get_heightmap_to_array()
+        heightmap.save_array()
         array = heightmap.get_array()
         list_array.append(array)
 
-    with open("arrays_compressed.npz", "wb") as f:
+    with open("maps/map_arrays_compressed.npz", "wb") as f:
         np.savez_compressed(f, **{f"array_{i}": arr for i, arr in enumerate(list_array)})
 
-def test_me():
-    loaded = np.load("arrays_compressed.npz")
 
-    for i, data in enumerate(maps_array):  # This will take a few minutes. will be faster if we use multiprocessing
+@timer_and_memory
+def save_me_load_existing_array():
+    list_array = []
+    for i, data in enumerate(maps_array):
+        directory = data[3]
+        size = data[1]
+        scaling = data[2]
+
+        print(f"map: {data[0]}")
+
+        heightmap = Heightmap("maps" + directory, size, scaling)
+        # heightmap.get_heightmap_to_array()
+        # heightmap.save_array()
+        try:
+            heightmap.load_array()
+        except Exception as error:
+            print(f"Error occured {error}")
+            print(f"Check if file is still existing. If not use save_me() function")
+        array = heightmap.get_array()
+        list_array.append(array)
+
+    with open("maps/map_arrays_compressed.npz", "wb") as f:
+        np.savez_compressed(f, **{f"array_{i}": arr for i, arr in enumerate(list_array)})
+
+@timer_and_memory
+def test_me():
+    loaded = np.load("maps/map_arrays_compressed.npz")
+
+    for i, data in enumerate(maps_array):
         directory = data[3]
         size = data[1]
         scaling = data[2]
@@ -167,7 +189,9 @@ def test_me():
         heightmap.load_array()
         array = heightmap.get_array()
         print("Checking if loaded is same...")
-        print(np.array_equal(array, loaded[f'array_{i+1}']))
+        print(np.array_equal(array, loaded[f'array_{i}']))
+
+
 
 if __name__ == "__main__":
-    test_me()
+    save_me_load_existing_array()
