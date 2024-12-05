@@ -1,12 +1,14 @@
+import random
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi import FastAPI, Response
 from fastapi.responses import StreamingResponse
-from fastapi.middleware.cors import CORSMiddleware
 import json, uvicorn
-from asyncio import sleep
-import random
+from asyncio import sleep, Event
 
+# Initialization
 app = FastAPI()
 
+# Added middleware to prevent the frontend from causing error
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -15,16 +17,37 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# PauseEventhandler
+pause_for_waypoint_generator = Event()
+pause_for_waypoint_generator.clear()
+long = 0
+lat = 0
+
+
+def set_waypoint(x, y):
+    global long, lat
+    long, lat = x, y
+
+
+def resume():
+    pause_for_waypoint_generator.set()
+    pass
+
+
+def pause():
+    pause_for_waypoint_generator.clear()
+    pass
+
 
 async def waypoints_generator():
     while True:
-        long = random.randint(-1000, 0)
-        lat = random.randint(0, 1000)
+        await pause_for_waypoint_generator.wait()
+
 
         event = "add"
         data = {
             "type": "Feature",
-            "geometry": {"type": "Point", "coordinates": [long, lat]},
+            "geometry": {"type": "Point", "coordinates": [lat, long]},
             "properties": {"id": 1, "lat": lat, "lon": long},
         }
 
@@ -32,7 +55,7 @@ async def waypoints_generator():
                            f"data: {json.dumps(data)}\n\n")
 
         yield (formatted_event)
-        print(f"x: {lat}\ny: {long}")
+        print(f"x: {long}\ny: {lat}")
         await sleep(5)
 
 
