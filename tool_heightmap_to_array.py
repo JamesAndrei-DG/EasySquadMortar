@@ -83,7 +83,6 @@ class Heightmap:
             self.buffer_height = height
             return height
 
-
     def get_heightmap_to_array(self):
         for x in range(self.array.shape[0]):
             for y in range(self.array.shape[1]):
@@ -95,11 +94,9 @@ class Heightmap:
     def load_array(self):
         self.array = np.load(str(self.dir + 'heightmap_array.npy'))
 
-
     def get_height_from_array(self, x, y):
         height = self.array[x][y]
         # print(f"----array----\nheight @[{x}][{y}]: {self.array[x][y]}")
-
 
     def get_height_from_map(self, x, y):
         height = self.get_height(x, y)
@@ -111,14 +108,19 @@ class Heightmap:
     def get_min_array(self):
         return self.array.min(), self.array.argmin()
 
-@timer_and_memory
+    def get_array(self):
+        return self.array
+
+
+# @timer_and_memory
 def for_heightmap(directory, size, scaling):
     heightmap = Heightmap("maps" + directory, size, scaling)
     for x in range(0, 1200, 2):
         for y in range(0, 1200, 2):
             heightmap.get_height_from_map((10 + x), (10 + y))
 
-@timer_and_memory
+
+# @timer_and_memory
 def for_array(directory, size, scaling):
     heightmap = Heightmap("maps" + directory, size, scaling)
     heightmap.load_array()
@@ -127,23 +129,45 @@ def for_array(directory, size, scaling):
             heightmap.get_height_from_array((10 + x), (10 + y))
 
 
-for i, data in enumerate(maps_array):
-    directory = data[3]
-    size = data[1]
-    scaling = data[2]
+@timer_and_memory
+def run_me():
+    list_array = []
+    for i, data in enumerate(maps_array):  # This will take a few minutes. will be faster if we use multiprocessing
+        directory = data[3]
+        size = data[1]
+        scaling = data[2]
 
-    print(f"map: {data[0]}")
-    # for_heightmap(directory, size, scaling)
-    # for_array(directory, size, scaling)
+        print(f"map: {data[0]}")
 
-    heightmap = Heightmap("maps" + directory, size, scaling)
-    # print(f"height: {heightmap.get_height(1500,1500)}\n\n")
-    # heightmap.get_heightmap_to_array()
-    # heightmap.save_array()
-    heightmap.load_array()
-    max, maxarg = heightmap.get_max_array()
-    min, minarg = heightmap.get_min_array()
-    # print(f"max @ {maxarg}: {max}\nmin @ {minarg}: {min}")
-    print(type(heightmap.array[500][100]))
-    # heightmap.get_height_from_array(1000,1000)
-    # heightmap.get_height_from_map(1000,1000)
+        heightmap = Heightmap("maps" + directory, size, scaling)
+        # heightmap.get_heightmap_to_array()
+        # heightmap.save_array()
+
+        heightmap.load_array()
+        array = heightmap.get_array()
+        list_array.append(array)
+
+    with open("arrays_compressed.npz", "wb") as f:
+        np.savez_compressed(f, **{f"array_{i}": arr for i, arr in enumerate(list_array)})
+
+def test_me():
+    loaded = np.load("arrays_compressed.npz")
+
+    for i, data in enumerate(maps_array):  # This will take a few minutes. will be faster if we use multiprocessing
+        directory = data[3]
+        size = data[1]
+        scaling = data[2]
+
+        print(f"map: {data[0]}")
+
+        heightmap = Heightmap("maps" + directory, size, scaling)
+        # heightmap.get_heightmap_to_array()
+        # heightmap.save_array()
+
+        heightmap.load_array()
+        array = heightmap.get_array()
+        print("Checking if loaded is same...")
+        print(np.array_equal(array, loaded[f'array_{i+1}']))
+
+if __name__ == "__main__":
+    test_me()
