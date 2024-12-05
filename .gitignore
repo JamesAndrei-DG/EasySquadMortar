@@ -3,7 +3,7 @@ test.html
 test*.py
 nasa.html
 # Numpy Array
-.npy
+*.npy
 
 # File Exempt
 !testheightcircle.py
