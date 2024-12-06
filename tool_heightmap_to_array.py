@@ -114,7 +114,7 @@ class Heightmap:
 
 # @timer_and_memory
 def for_heightmap(directory, size, scaling):
-    heightmap = Heightmap("maps" + directory, size, scaling)
+    heightmap = Heightmap("assets" + directory, size, scaling)
     for x in range(0, 1200, 2):
         for y in range(0, 1200, 2):
             heightmap.get_height_from_map((10 + x), (10 + y))
@@ -122,7 +122,7 @@ def for_heightmap(directory, size, scaling):
 
 # @timer_and_memory
 def for_array(directory, size, scaling):
-    heightmap = Heightmap("maps" + directory, size, scaling)
+    heightmap = Heightmap("assets" + directory, size, scaling)
     heightmap.load_array()
     for x in range(0, 1200, 2):
         for y in range(0, 1200, 2):
@@ -137,13 +137,13 @@ def save_me():
 
         print(f"map: {data[0]}")
 
-        heightmap = Heightmap("maps" + directory, size, scaling)
+        heightmap = Heightmap("assets" + directory, size, scaling)
         heightmap.get_heightmap_to_array()
         heightmap.save_array()
         array = heightmap.get_array()
         list_array.append(array)
 
-    with open("maps/map_arrays_compressed.npz", "wb") as f:
+    with open("core/map_arrays_compressed.npz", "wb") as f:
         np.savez_compressed(f, **{f"array_{i}": arr for i, arr in enumerate(list_array)})
 
 
@@ -157,7 +157,7 @@ def save_me_load_existing_array():
 
         print(f"map: {data[0]}")
 
-        heightmap = Heightmap("maps" + directory, size, scaling)
+        heightmap = Heightmap("assets" + directory, size, scaling)
         # heightmap.get_heightmap_to_array()
         # heightmap.save_array()
         try:
@@ -168,12 +168,12 @@ def save_me_load_existing_array():
         array = heightmap.get_array()
         list_array.append(array)
 
-    with open("maps/map_arrays_compressed.npz", "wb") as f:
+    with open("core/map_arrays_compressed.npz", "wb") as f:
         np.savez_compressed(f, **{f"array_{i}": arr for i, arr in enumerate(list_array)})
 
 @timer_and_memory
 def test_me():
-    loaded = np.load("maps/map_arrays_compressed.npz")
+    loaded = np.load("core/map_arrays_compressed.npz")
 
     for i, data in enumerate(maps_array):
         directory = data[3]
@@ -182,7 +182,7 @@ def test_me():
 
         print(f"map: {data[0]}")
 
-        heightmap = Heightmap("maps" + directory, size, scaling)
+        heightmap = Heightmap("assets" + directory, size, scaling)
         # heightmap.get_heightmap_to_array()
         # heightmap.save_array()
 

@@ -30,7 +30,7 @@ class maps(QObject):
         print(f"Selected map is: {message}")
 
     @Slot(str)
-    def origin_point(self, location: str):
+    def mortar_position(self, location: str):
         print(f"Origin is: {location}")
 
 

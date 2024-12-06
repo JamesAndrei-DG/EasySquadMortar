@@ -49,7 +49,7 @@ MenuItem {
         onAccepted: {
 
 
-            map_class_py.origin_point(mortarPosition.text.replace(/--+/g, ''));
+            map_class_py.mortar_position(mortarPosition.text.replace(/--+/g, ''));
         }
 
 

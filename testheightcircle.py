@@ -185,7 +185,7 @@ class Heightmap:
         # print(f"{self.array_height[350][140]}")
 
     def load_array(self):
-        self.array_height = np.load('maps/kohat/heightmap_array.npy')
+        self.array_height = np.load('assets/kohat/heightmap_array.npy')
 
     def find_from_array(self, x, y):
         return self.array_height[x][y]
@@ -274,7 +274,7 @@ class Heightmap:
 @timer_and_memory
 def getheight():
     # Example usage
-    heightmap = Heightmap("maps/kohat/heightmap.webp")
+    heightmap = Heightmap("assets/kohat/heightmap.webp")
     heightmap.load_array()
     # for azimuth in range(359):
     # for natomil in range(800,1580,10):

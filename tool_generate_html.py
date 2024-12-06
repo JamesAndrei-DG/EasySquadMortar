@@ -8,7 +8,7 @@ maps_array = parse_maps.parsemaps()
 for i, data in enumerate(maps_array):
     base_map = folium.Map(crs='Simple', zoom_start=4)
     map_overlay = folium.raster_layers.ImageOverlay(
-        image=str("./maps" + data[3] + "basemap.webp"),
+        image=str("./assets" + data[3] + "basemap.webp"),
         bounds=[[0, 0], [-int(data[1]), int(data[1])]],
         zigzag_index=1,
         zoom_control=False,
@@ -43,4 +43,4 @@ for i, data in enumerate(maps_array):
         """)
 
     # Save the map as an HTML file
-    base_map.save(str("qt/components/maps/" + data[0] + ".html"))
+    base_map.save(str("qt/components/assets/" + data[0] + ".html"))

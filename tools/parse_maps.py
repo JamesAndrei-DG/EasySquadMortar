@@ -1,8 +1,8 @@
 import re
 
 def parsemaps():
-    with open('./maps/maps.js', 'r') as file:
-        js_template = file.read()
+    with open('./assets/assets.js', 'r') as file:
+        javascript_file = file.read()
 
     name_pattern = r'name:\s*"([^"]*)"'
     size_pattern = r'size:\s*(\d+)'
@@ -12,11 +12,11 @@ def parsemaps():
 
     maps = []
 
-    name = re.findall(name_pattern, js_template)
-    size = re.findall(size_pattern, js_template)
-    scaling = re.findall(scaling_pattern, js_template)
-    mapURL = re.findall(mapURL_pattern, js_template)
-    maxZoomLevel = re.findall(maxZoomLevel_pattern, js_template)
+    name = re.findall(name_pattern, javascript_file)
+    size = re.findall(size_pattern, javascript_file)
+    scaling = re.findall(scaling_pattern, javascript_file)
+    mapURL = re.findall(mapURL_pattern, javascript_file)
+    maxZoomLevel = re.findall(maxZoomLevel_pattern, javascript_file)
 
     for i in range(len(name)):
         map_row = [
