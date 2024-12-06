@@ -164,7 +164,7 @@ def save_me_load_existing_array():
             heightmap.load_array()
         except Exception as error:
             print(f"Error occured {error}")
-            print(f"Check if file is still existing. If not use save_me() function")
+            print(f"Check if file is still existing. If not use save_me() function.")
         array = heightmap.get_array()
         list_array.append(array)
 
@@ -183,15 +183,12 @@ def test_me():
         print(f"map: {data[0]}")
 
         heightmap = Heightmap("assets" + directory, size, scaling)
-        # heightmap.get_heightmap_to_array()
-        # heightmap.save_array()
-
-        heightmap.load_array()
+        heightmap.get_heightmap_to_array()
         array = heightmap.get_array()
-        print("Checking if loaded is same...")
+        print("Checking if compressed array is same...")
         print(np.array_equal(array, loaded[f'array_{i}']))
 
 
 
 if __name__ == "__main__":
-    save_me_load_existing_array()
+    test_me()

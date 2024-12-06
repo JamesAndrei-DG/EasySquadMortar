@@ -9,10 +9,16 @@ nasa.html
 !testheightcircle.py
 
 # Folder
+
 tests/*
 qt/components/maps/*
 # Folder Exempt
 !qt/components/maps/javascript/
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
 
 ### PyCharm+all template
 # Covers JetBrains IDEs: IntelliJ, RubyMine, PhpStorm, AppCode, PyCharm, CLion, Android Studio, WebStorm and Rider

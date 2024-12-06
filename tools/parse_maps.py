@@ -1,7 +1,7 @@
 import re
 
 def parsemaps():
-    with open('./assets/assets.js', 'r') as file:
+    with open('./assets/maps.js', 'r') as file:
         javascript_file = file.read()
 
     name_pattern = r'name:\s*"([^"]*)"'

@@ -4,6 +4,7 @@ import numpy
 import easyocr
 
 # EasyOCR Config
+print(f"Loading EasyOcr model into Memory")
 reader = easyocr.Reader(['en'])
 
 

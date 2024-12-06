@@ -1,16 +1,20 @@
 import sys
 import os
 import re
-
-import PySide6.QtCore
-from PySide6.QtCore import QUrl, QObject, Signal, Slot
+from PySide6.QtCore import QUrl, QObject, Signal, Slot, QThread
 from PySide6.QtGui import QGuiApplication
 from PySide6.QtQml import QQmlApplicationEngine
 from PySide6.QtWebEngineQuick import QtWebEngineQuick
 from tools import parse_maps
+from tools import parse_screen
+
+# class Worker(QObject):
+#
+#     Q_OBJECT
 
 
-class maps(QObject):
+
+class Maps(QObject):
 
     def __init__(self):
         QObject.__init__(self)
@@ -34,6 +38,8 @@ class maps(QObject):
         print(f"Origin is: {location}")
 
 
+
+
 if __name__ == "__main__":
 
     # Initialization
@@ -43,7 +49,7 @@ if __name__ == "__main__":
     engine = QQmlApplicationEngine()
 
     # Map Class
-    map = maps()
+    map = Maps()
     engine.rootContext().setContextProperty("map_name_list_py", map.get_map_name())
     engine.rootContext().setContextProperty("map_class_py", map)
 
