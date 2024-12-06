@@ -1,44 +1,11 @@
 import sys
 import os
-import re
-from PySide6.QtCore import QUrl, QObject, Signal, Slot, QThread
+from PySide6.QtCore import QUrl, QThread
 from PySide6.QtGui import QGuiApplication
 from PySide6.QtQml import QQmlApplicationEngine
 from PySide6.QtWebEngineQuick import QtWebEngineQuick
-from tools import parse_maps
-from tools import parse_screen
-
-# class Worker(QObject):
-#
-#     Q_OBJECT
-
-
-
-class Maps(QObject):
-
-    def __init__(self):
-        QObject.__init__(self)
-        self.map_names = []
-
-    def get_map_name(self):
-        map_data = parse_maps.parsemaps()
-
-        for i, data in enumerate(map_data):
-            self.map_names.append(data[0])
-            self.map_names[i] = re.sub(r"(\w)([A-Z])", r"\1 \2", self.map_names[i])
-
-        return self.map_names
-
-    @Slot(str)
-    def selected_map(self, message: str):
-        print(f"Selected map is: {message}")
-
-    @Slot(str)
-    def mortar_position(self, location: str):
-        print(f"Origin is: {location}")
-
-
-
+from tools.worker_thread import ObjectEasyOCR
+from tools.map_object import Maps
 
 if __name__ == "__main__":
 
@@ -47,6 +14,14 @@ if __name__ == "__main__":
     app = QGuiApplication(sys.argv)
 
     engine = QQmlApplicationEngine()
+
+    # Qthread
+    ThreadEasyOCR = QThread()
+    EasyOCR = ObjectEasyOCR()
+    EasyOCR.moveToThread(ThreadEasyOCR)
+
+    ThreadEasyOCR.started.connect(EasyOCR.run_EasyOCR)
+    ThreadEasyOCR.start()
 
     # Map Class
     map = Maps()
