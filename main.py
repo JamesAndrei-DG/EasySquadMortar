@@ -4,8 +4,8 @@ from PySide6.QtCore import QUrl, QThread
 from PySide6.QtGui import QGuiApplication
 from PySide6.QtQml import QQmlApplicationEngine
 from PySide6.QtWebEngineQuick import QtWebEngineQuick
-from tools.worker_thread import ObjectEasyOCR
-from tools.map_object import Maps
+from core.worker_thread import ObjectEasyOCR
+from core.map_object import Maps
 
 if __name__ == "__main__":
 

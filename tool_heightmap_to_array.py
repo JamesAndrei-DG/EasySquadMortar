@@ -3,9 +3,9 @@ import time
 import tracemalloc
 import numpy as np
 
-from tools import parse_maps
+from core.parse_maps import parsemaps
 
-maps_array = parse_maps.parsemaps()
+maps_array = parsemaps()
 
 
 def timer_and_memory(func):
@@ -143,7 +143,7 @@ def save_me():
         array = heightmap.get_array()
         list_array.append(array)
 
-    with open("core/map_arrays_compressed.npz", "wb") as f:
+    with open("core/arrays/map_arrays_compressed.npz", "wb") as f:
         np.savez_compressed(f, **{f"array_{i}": arr for i, arr in enumerate(list_array)})
 
 
@@ -168,12 +168,12 @@ def save_me_load_existing_array():
         array = heightmap.get_array()
         list_array.append(array)
 
-    with open("core/map_arrays_compressed.npz", "wb") as f:
+    with open("core/arrays/map_arrays_compressed.npz", "wb") as f:
         np.savez_compressed(f, **{f"array_{i}": arr for i, arr in enumerate(list_array)})
 
 @timer_and_memory
 def test_me():
-    loaded = np.load("core/map_arrays_compressed.npz")
+    loaded = np.load("core/arrays/map_arrays_compressed.npz")
 
     for i, data in enumerate(maps_array):
         directory = data[3]

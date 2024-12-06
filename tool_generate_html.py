@@ -1,9 +1,9 @@
 import folium
 import jinja2
 from folium.plugins import Realtime
-from tools import parse_maps
+from core.parse_maps import parsemaps
 
-maps_array = parse_maps.parsemaps()
+maps_array = parsemaps()
 
 for i, data in enumerate(maps_array):
     base_map = folium.Map(crs='Simple', zoom_start=4)

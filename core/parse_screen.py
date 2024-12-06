@@ -55,6 +55,8 @@ class ScreenOCR:
             img = numpy.asarray(screenshot, dtype=numpy.uint8)
             img_gray = cv2.cvtColor(img, cv2.COLOR_BGRA2GRAY)
             (thresh, self.img_monochrome) = cv2.threshold(img_gray, 170, 255, cv2.THRESH_BINARY)
+
+            # For Visualization
             # cv2.imshow("Bearing Screen Capture", self.img_monochrome)
 
             return reader.readtext(self.img_monochrome, allowlist=".0123456789", detail=0)
@@ -66,8 +68,9 @@ class ScreenOCR:
             img_gray = cv2.cvtColor(img, cv2.COLOR_BGRA2GRAY)
             (thresh, self.natomil_monochrome) = cv2.threshold(img_gray, 140, 255, cv2.THRESH_BINARY)
 
+            # For Visualization
             # cv2.imshow("Radian Gray Screen Capture", img_gray)
-            cv2.imshow("Radian Monochrome Screen Capture", self.natomil_monochrome)
+            # cv2.imshow("Radian Monochrome Screen Capture", self.natomil_monochrome)
 
             return reader.readtext(self.natomil_monochrome, allowlist="0123456789", mag_ratio=2, text_threshold=0.80,
                                    low_text=0.2, link_threshold=0.2)
