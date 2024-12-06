@@ -49,7 +49,7 @@ ApplicationWindow {
         target: mapWindow
         property: "opacity"
         from: 0
-        to: 0.5
+        to: 1
         duration: 2000  // Duration of the fade-out effect
         easing.type: Easing.InQuart  // Ease-in quad effect
     }

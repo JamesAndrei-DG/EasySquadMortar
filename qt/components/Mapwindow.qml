@@ -18,7 +18,7 @@ Window {
         id: webViewContainer
         anchors.fill: parent
         url: Qt.resolvedUrl("maps/" + mapWindow.map_selected.replace(" ", "") + ".html")
-        opacity: 0.5
+
 
         settings {
             javascriptEnabled: true

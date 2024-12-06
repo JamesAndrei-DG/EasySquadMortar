@@ -19,14 +19,15 @@ app.add_middleware(
 
 # PauseEventhandler
 pause_for_waypoint_generator = Event()
-pause_for_waypoint_generator.clear()
+pause_for_waypoint_generator.set()
 long = 0
 lat = 0
 
 
 def set_waypoint(x, y):
     global long, lat
-    long, lat = x, y
+    long = random.randint(100, 1000)
+    lat = random.randint(-1000, -100)
 
 
 def resume():
@@ -41,8 +42,8 @@ def pause():
 
 async def waypoints_generator():
     while True:
+        set_waypoint(1,2)
         await pause_for_waypoint_generator.wait()
-
 
         event = "add"
         data = {

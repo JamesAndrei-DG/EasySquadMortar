@@ -4,7 +4,7 @@ from PySide6.QtCore import QUrl, QThread
 from PySide6.QtGui import QGuiApplication
 from PySide6.QtQml import QQmlApplicationEngine
 from PySide6.QtWebEngineQuick import QtWebEngineQuick
-from core.worker_thread import ObjectEasyOCR
+from core.worker_threads import ObjectFastApi, ObjectEasyOCR
 from core.map_object import Maps
 
 if __name__ == "__main__":
@@ -17,11 +17,16 @@ if __name__ == "__main__":
 
     # Qthread
     ThreadEasyOCR = QThread()
+    ThreadFastAPi = QThread()
     EasyOCR = ObjectEasyOCR()
+    FastApi = ObjectFastApi()
     EasyOCR.moveToThread(ThreadEasyOCR)
+    FastApi.moveToThread(ThreadFastAPi)
 
     ThreadEasyOCR.started.connect(EasyOCR.run_EasyOCR)
+    ThreadFastAPi.started.connect(FastApi.run_FastApi)
     ThreadEasyOCR.start()
+    ThreadFastAPi.start()
 
     # Map Class
     map = Maps()
