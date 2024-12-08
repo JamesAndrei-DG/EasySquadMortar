@@ -9,7 +9,6 @@ nasa.html
 test*
 
 # File Exempt
-!testheightcircle.py
 
 # Folder
 tests/*
