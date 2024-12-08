@@ -1,41 +1,9 @@
 import cv2
-import time
-import tracemalloc
 import numpy as np
 
 from core.parse_maps import parsemaps
 
 maps_array = parsemaps()
-
-
-def timer_and_memory(func):
-    def wrapper(*args, **kwargs):
-        # Start tracing memory
-        tracemalloc.start()
-
-        # Record start time with high precision
-        start_time = time.perf_counter()
-
-        # Execute the function
-        result = func(*args, **kwargs)
-
-        # Record end time
-        end_time = time.perf_counter()
-
-        # Capture memory usage
-        current, peak = tracemalloc.get_traced_memory()
-
-        # Stop tracing memory
-        tracemalloc.stop()
-
-        # Display results with high precision
-        print(f"Function '{func.__name__}' executed in {end_time - start_time:.10f} seconds.")
-        print(f"Current memory usage: {current / 1024:.2f} KB")
-        print(f"Peak memory usage: {peak / 1024:.2f} KB")
-
-        return result
-
-    return wrapper
 
 
 class Heightmap:
@@ -112,7 +80,6 @@ class Heightmap:
         return self.array
 
 
-# @timer_and_memory
 def for_heightmap(directory, size, scaling):
     heightmap = Heightmap("assets" + directory, size, scaling)
     for x in range(0, 1200, 2):
@@ -120,13 +87,13 @@ def for_heightmap(directory, size, scaling):
             heightmap.get_height_from_map((10 + x), (10 + y))
 
 
-# @timer_and_memory
 def for_array(directory, size, scaling):
     heightmap = Heightmap("assets" + directory, size, scaling)
     heightmap.load_array()
     for x in range(0, 1200, 2):
         for y in range(0, 1200, 2):
             heightmap.get_height_from_array((10 + x), (10 + y))
+
 
 def save_me():
     list_array = []
@@ -147,7 +114,6 @@ def save_me():
         np.savez_compressed(f, **{f"array_{i}": arr for i, arr in enumerate(list_array)})
 
 
-@timer_and_memory
 def save_me_load_existing_array():
     list_array = []
     for i, data in enumerate(maps_array):
@@ -171,7 +137,7 @@ def save_me_load_existing_array():
     with open("core/arrays/map_arrays_compressed.npz", "wb") as f:
         np.savez_compressed(f, **{f"array_{i}": arr for i, arr in enumerate(list_array)})
 
-@timer_and_memory
+
 def test_me():
     loaded = np.load("core/arrays/map_arrays_compressed.npz")
 
@@ -187,7 +153,6 @@ def test_me():
         array = heightmap.get_array()
         print("Checking if compressed array is same...")
         print(np.array_equal(array, loaded[f'array_{i}']))
-
 
 
 if __name__ == "__main__":
