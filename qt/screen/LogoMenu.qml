@@ -11,7 +11,9 @@ Menu {
 
     }
 
+    TestItemTargetPos{
 
+    }
 
 
     MenuItem {

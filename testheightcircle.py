@@ -1,14 +1,27 @@
 import os
 import sys
+from os import cpu_count
 
 import cv2
 import time
 import tracemalloc
 import math
 import numpy as np
-from multiprocessing import Pool
 from scipy.optimize import curve_fit
 import matplotlib.pyplot
+
+from functools import wraps
+
+from multiprocessing import Pool, Manager, Lock
+
+def count_calls(args):
+    func, lock, shared_counter, name = args
+
+    with lock:  # Acquire lock to safely update the counter
+        shared_counter.value += 1
+        # print(f"{func.__name__} has been called {shared_counter.value} times.")
+
+    return func(name)
 
 
 def timer_and_memory(func):
@@ -65,9 +78,13 @@ class Heightmap:
         self.scaling_height = 0.733125
         self.height, self.width, _ = self.image.shape
         # print(f"height: {self.height}\nwidth: {self.width}")
-        self.origin_x = 2000
-        self.origin_y = 2000
+        self.origin_x = 2500
+        self.origin_y = 2500
         self.array_height = np.zeros((4617, 4617))
+        self.load = np.load("core/arrays/map_arrays_compressed.npz")
+        self.array_height = self.load["array_12"]
+        self.t_calc = 0
+        self.t_get_height = 0
 
 
     def get_height(self, find_x, find_y):
@@ -142,7 +159,9 @@ class Heightmap:
         self.origin_y += interval / 2
         self.origin_x = int(self.origin_x)
         self.origin_y = int(self.origin_y)
+
         # print(f"x: {self.origin_x}\ny: {self.origin_y}")
+
 
     def get_height_line_array(self, azimuth):
         rad = azimuth * math.pi / 180
@@ -190,16 +209,24 @@ class Heightmap:
     def find_from_array(self, x, y):
         return self.array_height[x][y]
 
-    def get_distance(self, rad, azimuth):
+    def get_distance(self, rad, azimuth, heightline):
         origin_elevation = self.find_from_array(self.origin_x, self.origin_y)
         x = 0
         y = origin_elevation
-        t = 15
+        if rad >= 1.36:
+            t = 22
+        elif rad >= 1.17:
+            t = 20
+        elif rad >= 0.92:
+            t = 18
+        else:
+            t = 14
         velocity = 110
         vx = velocity * math.cos(rad)
         vy = velocity * math.sin(rad)
         step = 1
-        height = self.get_height_line_array(azimuth)
+        degree = rad * 180 / math.pi
+
 
         while True:
             # Update position
@@ -208,11 +235,12 @@ class Heightmap:
             y = origin_elevation + vy * t - 0.5 * 9.81 * t ** 2
 
             find_x = round(x / 10)
-            height_at_x = height[find_x]
+            self.t_calc += 1
 
             # Check for impact
-            if y <= height_at_x:
-                # print(f"distance: {x}meters in {t} steps")
+            if y <= heightline[find_x]:
+                # print(f"distance: {int(x)}meters in {t} steps @ degree: {degree} rad: {rad}")
+
                 return x  # Impact point
 
             # Increment time
@@ -226,21 +254,48 @@ class Heightmap:
 
         return result
 
+
     def get_height_range_az(self, az):
         result = []
+        heightline = self.get_height_line_array(az)
 
         for natomil in range(800, 1580, 10):
-            result.append(self.get_distance((natomil * 0.981719 * 0.001), az))
+
+            result.append(self.get_distance((natomil * 0.981719 * 0.001), az, heightline))
 
         return result
 
     def calculate_the_circle(self):
-        # use multi proces to calculate the 360 for each azimuth
-        myrange = range(359)
+        with Manager() as manager:
+            shared_counter = manager.Value('i', 0)  # Shared integer initialized to 0
+            lock = manager.Lock()
 
-        p = Pool()
-        result = p.map(self.get_height_range_az, myrange)
-        # print(result)
+
+            # Use a Pool to parallelize calls
+            with Pool(processes=1) as pool:
+                # Prepare arguments: func, lock, shared_counter, and name
+                args = [(self.get_height_range_az, lock, shared_counter, i)for i in range(359)]
+
+                # Execute the pool function
+                results = pool.map(count_calls, args)
+
+            print(f"greet was called {shared_counter.value} times.")
+            print(f"cpucount{cpu_count()}")
+
+
+
+
+        # # use multi proces to calculate the 360 for each azimuth
+        # myrange = range(359)
+        #
+        # p = Pool()
+        # result = p.map(self.get_height_range_az, myrange)
+        # # print(result)
+
+    def calc_me(self):
+        result =[]
+        for azimuth in range(359):
+            result.append(self.get_height_range_az(azimuth))
 
     def test_get_height_range(self):
         result = []
@@ -275,7 +330,7 @@ class Heightmap:
 def getheight():
     # Example usage
     heightmap = Heightmap("assets/kohat/heightmap.webp")
-    heightmap.load_array()
+    # heightmap.load_array()
     # for azimuth in range(359):
     # for natomil in range(800,1580,10):
     # heightmap.get_distance((natomil * 0.981719 * 0.001),azimuth)
@@ -289,12 +344,15 @@ def getheight():
 
     # for multiprocessor
     # heightmap.calculate_the_circle()
+    heightmap.calc_me()
 
     # heightmap.test_get_distance_one()
     # heightmap.test_get_height_range()
 
-    heightmap.test_parabola_range()
+    # heightmap.test_parabola_range()
+    print(f"t calc = {heightmap.t_calc}")
 
 
 if __name__ == '__main__':
     getheight()
+
