@@ -73,12 +73,12 @@ Rectangle {
     }
 
 
-    Mapselector {
+    MapSelector {
         id: mapSelector
     }
 
 
-    Logobutton {
+    LogoButton {
         id: logoButton
     }
 

@@ -7,9 +7,11 @@ Menu {
     id: overlayMenu
 
 
-    Menuitemmortarpos{
+    MenuItemMortarPos{
 
     }
+
+
 
 
     MenuItem {

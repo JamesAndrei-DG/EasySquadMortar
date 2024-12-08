@@ -47,7 +47,7 @@ Rectangle {
         }
 
 
-        Logomenu {
+        LogoMenu {
             id: overlayMenu
         }
 

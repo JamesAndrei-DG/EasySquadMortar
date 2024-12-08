@@ -1,15 +1,17 @@
 # File
 test.html
-test*.py
 nasa.html
+
 # Numpy Array
 *.npy
+
+#File and Directory
+test*
 
 # File Exempt
 !testheightcircle.py
 
 # Folder
-
 tests/*
 qt/components/maps/*
 # Folder Exempt
