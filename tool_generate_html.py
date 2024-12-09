@@ -42,5 +42,9 @@ for i, data in enumerate(maps_array):
             {% endmacro %}
         """)
 
+    # Compatibility with narva_f map
+    if "Narva_f" in data:
+        data[0] = "Narvaf"
+
     # Save the map as an HTML file
     base_map.save(str("qt/components/maps/" + data[0] + ".html"))

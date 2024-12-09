@@ -13,19 +13,22 @@ class Maps(QObject):
         self.target_keypad = ''
 
         self.map_data = parsemaps()
-        self.MapFunction = MapFunction(self.map_data[0][1],) #initialize map function to first array
-
+        self.MapFunction = MapFunction(self.map_data[0][1], )  # initialize map function to first array
 
     def get_map_names(self):
         for i, data in enumerate(self.map_data):
             self.map_names.append(data[0])
-            self.map_names[i] = re.sub(r"(\w)([A-Z])", r"\1 \2", self.map_names[i])
+            self.map_names[i] = re.sub(r"(\w)([A-Z])|_", r"\1 \2", self.map_names[i])
 
         return self.map_names
 
     @Slot(str)
-    def selected_map(self, map: str):
-        print(f"Selected map is: {map}")
+    def selected_map(self, map_index: int):
+        #Need to include try block incase it goes wrong
+
+        print(f"Selected map index: {map_index}")
+
+
 
     @Slot(str)
     def mortar_position(self, keypad: str):

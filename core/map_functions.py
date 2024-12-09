@@ -2,9 +2,6 @@ import math
 import numpy as np
 
 
-
-
-
 class MapFunction:
     def __init__(self, size):
         # Initialize map array and set to first array(Al Basrah)
@@ -21,6 +18,7 @@ class MapFunction:
         # do calculations remove before production
 
     def change_map(self, array_number):
+        print(f"Changing array map")
         self.array_height = self.array_maps[f"array_{array_number}"]
 
     def set_origin(self, x, y):
@@ -115,7 +113,6 @@ class MapFunction:
         # print(f"Azimuth: {azimuth}")
         # print(height_array)
         return height_array
-
 
     def _precalculate_fire_solution(self):
         print("Precalculating fire solution")
