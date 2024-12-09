@@ -18,20 +18,29 @@ if __name__ == "__main__":
     # Qthread
     ThreadEasyOCR = QThread()
     ThreadFastAPi = QThread()
+
     EasyOCR = ObjectEasyOCR()
     FastApi = ObjectFastApi()
+
     EasyOCR.moveToThread(ThreadEasyOCR)
     FastApi.moveToThread(ThreadFastAPi)
 
     ThreadEasyOCR.started.connect(EasyOCR.run_EasyOCR)
     ThreadFastAPi.started.connect(FastApi.run_FastApi)
-    ThreadEasyOCR.start()
-    ThreadFastAPi.start()
+
+    # ThreadEasyOCR.start()
+    # ThreadFastAPi.start()
+
 
     # Map Class
     map = Maps()
     engine.rootContext().setContextProperty("map_name_list_py", map.get_map_names())
     engine.rootContext().setContextProperty("map_class_py", map)
+
+    # Clean up
+    ThreadEasyOCR.finished.connect(EasyOCR.deleteLater)
+    ThreadFastAPi.finished.connect(FastApi.deleteLater)
+
 
 
     # Load Qml
