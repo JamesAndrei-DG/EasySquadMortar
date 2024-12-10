@@ -70,11 +70,26 @@ class MapFunction:
         origin_elevation = self.get_height(self.origin_x, self.origin_y)
         x = 0
         y = 0
-        t = 14
+        if rad > 1.36:
+            t = 21
+        elif rad > 1.22:
+            t = 20
+        elif rad > 1.11:
+            t = 19
+        elif rad > 1.03:
+            t = 18
+        elif rad > 0.95:
+            t = 17
+        elif rad > 0.87:
+            t = 16
+        elif rad > 0.82:
+            t = 15
+        else:
+            t = 14
         velocity = 110
         vx = velocity * math.cos(rad)
         vy = velocity * math.sin(rad)
-        step = 0.5
+        step = 0.01
         height_arr = height_array
         try:
             while True:
@@ -86,7 +101,7 @@ class MapFunction:
                 find_x = round(x / 10)
 
                 if y <= height_arr[find_x]:
-                    # print(f"distance: {x}meters in {t} steps")
+                    # print(f"distance: {x}meters in {t} steps with rad: {rad} deg{np.rad2deg(rad)}")
                     return x  # Impact point
 
                 # Increment time
