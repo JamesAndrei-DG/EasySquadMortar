@@ -1,5 +1,6 @@
 import math
 import numpy as np
+import numpy.typing as npt
 from time import perf_counter
 import inspect
 
@@ -19,24 +20,24 @@ class MapFunction:
         # bool
         self.precalculated = False
 
-    def change_map(self, array_number):
+    def change_map(self, array_number: int) -> None:
         print(f"Changing array map")
         self.array_map_height = self.maps_arrays[f"array_{array_number}"]
 
-    def set_origin_xy(self, x, y):
+    def set_origin_xy(self, x: int, y: int) -> None:  # return true
         print(f"Setting Origin ({x},{y})")
         self.origin_x = x
         self.origin_y = y
         self._precalculate_fire_solution()
 
-    def set_origin_keypad(self, keypad):
+    def set_origin_keypad(self, keypad: str) -> None:
         print(f"Setting Origin to keypad: {keypad}")
         self.origin_x, self.origin_y = self.get_keypad_position(keypad)
         print(f"x: {self.origin_x} y: {self.origin_y}")
         self._precalculate_fire_solution()
 
     # Need to sanitize before using function
-    def get_keypad_position(self, keypad):
+    def get_keypad_position(self, keypad: str) -> tuple:
         try:
             keys = keypad.split("-")
             x = 0
@@ -70,7 +71,7 @@ class MapFunction:
     def xy_to_keypad(self):
         pass
 
-    def get_height(self, x, y):
+    def get_height(self, x: int, y: int) -> float:
         # is there better way to fix this?
         # if x > 0 or y > 0 :
         #     raise ValueError(f"x:{x} y:{y} is invalid")
@@ -84,7 +85,7 @@ class MapFunction:
         except Exception as error:
             raise Exception(f"Error Encountered in {inspect.currentframe().f_code.co_name}\n{error}")
 
-    def get_distance(self, rad, elevation_array):
+    def get_distance(self, rad: float, elevation_array: list) -> int:
         origin_elevation = self.get_height(self.origin_x, self.origin_y)
         x = 0
         y = 0
@@ -127,7 +128,7 @@ class MapFunction:
         except Exception as error:
             print(f"Error Encountered in {inspect.currentframe().f_code.co_name}\n{error}")
 
-    def _calculate_all_possible_distances_from_azimuth(self, azimuth):
+    def _calculate_all_possible_distances_from_azimuth(self, azimuth: int) -> list:
         result = []
         elevation_range = self._calculate_elevation_range_from_azimuth(azimuth)
         for natomil in range(800, 1580 + 1, 10):
@@ -135,7 +136,7 @@ class MapFunction:
 
         return result
 
-    def _calculate_elevation_range_from_azimuth(self, azimuth):
+    def _calculate_elevation_range_from_azimuth(self, azimuth: int) -> list:
         rad = azimuth * math.pi / 180
         # find height 0-1500 meters out with 10 meters step lets check later if i can make it more resolution
         x_scale = np.sin(rad)
@@ -149,7 +150,7 @@ class MapFunction:
 
         return height_array
 
-    def _precalculate_fire_solution(self):
+    def _precalculate_fire_solution(self) -> None:
         self.precalculated = False
         print("Precalculating fire solution")
         t1 = perf_counter()
@@ -160,23 +161,27 @@ class MapFunction:
         print(f"Calculation Finished in {time} ms")
         self.precalculated = True
 
-    def shoot_distance(self, azimuth, natomils):
+    def shoot_distance(self, bearing: float, natomils: int) -> int:
         # Check Exceptions
         if natomils < 800 or natomils > 1580:
             raise ValueError(f"{natomils} is an invalid input in natomils")
-        elif azimuth < 0 or azimuth > 359:
-            raise ValueError(f"{azimuth} is an invalid input in azimuth")
+        elif bearing < 0 or bearing > 359:
+            raise ValueError(f"{bearing} is an invalid input in bearing")
 
         # If not precalculated
         if self.precalculated == False:
             # approximation
-            elevation_array = self._calculate_elevation_range_from_azimuth(int(azimuth))
+            elevation_array = self._calculate_elevation_range_from_azimuth(int(bearing))
             return self.get_distance(natomils * 0.981719 * 0.001, elevation_array)
 
+
         index = max(0, int((natomils - 800) / 10))
-        bearing = int(azimuth)
+        true_natomils = float(natomils/10)
+        true_bearing = bearing
+
+
         try:
-            value = self.array_heightlines[bearing][index]
+            value = self.array_heightlines[int(bearing)][index]
             print("Shoot success")
             print(value)
             return value
