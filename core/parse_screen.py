@@ -8,16 +8,6 @@ print(f"Loading EasyOcr model into Memory")
 reader = easyocr.Reader(['en'])
 
 
-def parsescreen():
-    fire_solution = ScreenOCR()
-    while True:
-        # call for bearing/radian
-        fire_solution.get_natomil()
-        cv2.waitKey(100)
-    cv2.destroyAllWindows()
-    pass
-
-
 class ScreenOCR:
     screen_resolution = (1920, 1080)
     bearing_screen_coordinates = {"top": 1050, "left": 940, "width": 41, "height": 16}
@@ -27,7 +17,6 @@ class ScreenOCR:
     def __init__(self):
         # Variables for radians
         print(f"Initializing Screen OCR")
-        self.natomil_monochrome = None
         self.natomil_results = None
         self.box_height = [0, 0]
         self.box_position = [0, 0]
@@ -35,10 +24,10 @@ class ScreenOCR:
         self.pixel_per_natomil = 5
         self.buffer_natomil = 0
 
-    def get_bearing(self):
+    def get_bearing(self) -> list:
         return self.get_bearing_ocr_results()
 
-    def get_natomil(self):
+    def get_natomil(self) -> int:
         value = self.approximate_natomil()
         if value:
 
@@ -49,33 +38,33 @@ class ScreenOCR:
                 return 0
         return self.buffer_natomil
 
-    def get_bearing_ocr_results(self):
+    def get_bearing_ocr_results(self) -> list:
         with mss.mss() as sct:
             screenshot = sct.grab(self.bearing_screen_coordinates)
             img = numpy.asarray(screenshot, dtype=numpy.uint8)
             img_gray = cv2.cvtColor(img, cv2.COLOR_BGRA2GRAY)
-            (thresh, self.img_monochrome) = cv2.threshold(img_gray, 170, 255, cv2.THRESH_BINARY)
+            (thresh, img_monochrome) = cv2.threshold(img_gray, 170, 255, cv2.THRESH_BINARY)
 
             # For Visualization
-            # cv2.imshow("Bearing Screen Capture", self.img_monochrome)
+            # cv2.imshow("Bearing Screen Capture", img_monochrome)
 
-            return reader.readtext(self.img_monochrome, allowlist=".0123456789", detail=0)
+            return reader.readtext(img_monochrome, allowlist=".0123456789", detail=0)
 
-    def get_natomil_ocr_results(self):  # this will return easyocr results for mil
+    def get_natomil_ocr_results(self) -> list:  # this will return easyocr results for mil
         with mss.mss() as sct:
             screenshot = sct.grab(self.natomil_screen_coordinates)
             img = numpy.asarray(screenshot, dtype=numpy.uint8)
             img_gray = cv2.cvtColor(img, cv2.COLOR_BGRA2GRAY)
-            (thresh, self.natomil_monochrome) = cv2.threshold(img_gray, 140, 255, cv2.THRESH_BINARY)
+            (thresh, natomil_monochrome) = cv2.threshold(img_gray, 140, 255, cv2.THRESH_BINARY)
 
             # For Visualization
             # cv2.imshow("Radian Gray Screen Capture", img_gray)
-            # cv2.imshow("Radian Monochrome Screen Capture", self.natomil_monochrome)
+            # cv2.imshow("Radian Monochrome Screen Capture", natomil_monochrome)
 
-            return reader.readtext(self.natomil_monochrome, allowlist="0123456789", mag_ratio=2, text_threshold=0.80,
+            return reader.readtext(natomil_monochrome, allowlist="0123456789", mag_ratio=2, text_threshold=0.80,
                                    low_text=0.2, link_threshold=0.2)
 
-    def approximate_natomil(self):
+    def approximate_natomil(self) -> int:
         natomil_results = self.get_natomil_ocr_results()
         if natomil_results:
             try:
@@ -110,4 +99,4 @@ class ScreenOCR:
 
 
 if __name__ == "__main__":
-    parsescreen()
+    pass
