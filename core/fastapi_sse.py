@@ -55,7 +55,7 @@ async def waypoints_generator() -> list:
         formatted_event = (f"event: {event}\n"
                            f"data: {json.dumps(data)}\n\n")
 
-        yield (formatted_event)
+        yield formatted_event
         print(f"x: {long}\ny: {lat}")
         await sleep(5)
 

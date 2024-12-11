@@ -7,7 +7,7 @@ import uvicorn
 class ObjectEasyOCR(QObject):
     # Implement a signal to get my data
 
-    def run_EasyOCR(self):
+    def run_EasyOCR(self) -> None:
         easyocr = ScreenOCR()
         while True:
             # print(f"NatoMil: {easyocr.get_natomil()}")
@@ -17,6 +17,6 @@ class ObjectEasyOCR(QObject):
 
 class ObjectFastApi(QObject):
 
-    def run_FastApi(self):
+    def run_FastApi(self) -> None:
         uvicorn.run(app, host="127.0.0.1", port=8000, reload=False)
         pass
