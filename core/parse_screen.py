@@ -3,10 +3,6 @@ import cv2
 import numpy
 import easyocr
 
-# EasyOCR Config
-print(f"Loading EasyOcr model into Memory")
-reader = easyocr.Reader(['en'])
-
 
 class ScreenOCR:
     screen_resolution = (1920, 1080)
@@ -23,6 +19,9 @@ class ScreenOCR:
         self.box_difference = None
         self.pixel_per_natomil = 5
         self.buffer_natomil = 0
+        print(f"Loading EasyOcr model into Memory")
+        # EasyOCR Config Reader
+        self.reader = easyocr.Reader(['en'])
 
     def get_bearing(self) -> list:
         return self.get_bearing_ocr_results()
@@ -48,7 +47,7 @@ class ScreenOCR:
             # For Visualization
             # cv2.imshow("Bearing Screen Capture", img_monochrome)
 
-            return reader.readtext(img_monochrome, allowlist=".0123456789", detail=0)
+            return self.reader.readtext(img_monochrome, allowlist=".0123456789", detail=0)
 
     def get_natomil_ocr_results(self) -> list:  # this will return easyocr results for mil
         with mss.mss() as sct:
@@ -61,8 +60,8 @@ class ScreenOCR:
             # cv2.imshow("Radian Gray Screen Capture", img_gray)
             # cv2.imshow("Radian Monochrome Screen Capture", natomil_monochrome)
 
-            return reader.readtext(natomil_monochrome, allowlist="0123456789", mag_ratio=2, text_threshold=0.80,
-                                   low_text=0.2, link_threshold=0.2)
+            return self.reader.readtext(natomil_monochrome, allowlist="0123456789", mag_ratio=2, text_threshold=0.80,
+                                        low_text=0.2, link_threshold=0.2)
 
     def approximate_natomil(self) -> int:
         natomil_results = self.get_natomil_ocr_results()
