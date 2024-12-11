@@ -10,7 +10,7 @@ app = FastAPI()
 
 # Added middleware to prevent the frontend from causing error
 app.add_middleware(
-    CORSMiddleware,
+    CORSMiddleware,  # type hint bug https://github.com/fastapi/fastapi/discussions/10968
     allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
@@ -24,25 +24,25 @@ long = 0
 lat = 0
 
 
-def set_waypoint(x, y):
+def set_waypoint(x: int, y: int) -> None:
     global long, lat
-    long = random.randint(100, 1000)
-    lat = random.randint(-1000, -100)
+    long = long
+    lat = lat
 
 
-def resume():
+def resume() -> None:
     pause_for_waypoint_generator.set()
     pass
 
 
-def pause():
+def pause() -> None:
     pause_for_waypoint_generator.clear()
     pass
 
 
-async def waypoints_generator():
+async def waypoints_generator() -> list:
     while True:
-        set_waypoint(1,2)
+        set_waypoint(1, 2)
         await pause_for_waypoint_generator.wait()
 
         event = "add"
@@ -61,7 +61,7 @@ async def waypoints_generator():
 
 
 @app.get("/impact-point")
-async def root():
+async def root() -> StreamingResponse:
     return StreamingResponse(waypoints_generator(), media_type="text/event-stream")
 
 
