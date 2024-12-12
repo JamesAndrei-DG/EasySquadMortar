@@ -1,4 +1,4 @@
-from PySide6.QtCore import QThread, QObject, Signal, Slot
+from PySide6.QtCore import QObject
 from core.parse_screen import ScreenOCR
 from core.fastapi_sse import app
 import uvicorn

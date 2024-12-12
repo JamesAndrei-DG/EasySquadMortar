@@ -10,8 +10,11 @@ class MapFunction:
         self.maps_arrays = np.load("core/arrays/map_arrays_compressed.npz")
         self.array_map_height = self.maps_arrays["array_0"]  # Map default is al basrah
 
-        # Initialize heightline
-        self.precalculated_firing_solution = []
+        # Contents:
+        # precalculated_firing_solution[azimuth][NATOmil/step][0] height #step should be 10
+        # precalculated_firing solution[azimuth][NATOmil/step][1] x_location
+        # precalculated_firing solution[azimuth][NATOmil/step][1] y_location
+        self.precalculated_firing_solution = []  # list of list of tuples
 
         self.origin_x = 0
         self.origin_y = 0
@@ -24,7 +27,7 @@ class MapFunction:
         self.array_map_height = self.maps_arrays[f"array_{array_number}"]
 
     def set_origin_xy(self, x: int, y: int) -> None:  # return true
-        print(f"Setting Origin ({x},{y})") #check if out of bounds
+        print(f"Setting Origin ({x},{y})")  # check if out of bounds
         self.origin_x = x
         self.origin_y = y
         self._precalculate_fire_solution()
@@ -135,6 +138,14 @@ class MapFunction:
 
         return result
 
+    def _find_xy_from_origin(self, azimuth_f: float, meters: float) -> tuple[int, int]:
+        rad = azimuth_f * math.pi / 180
+        x_scale = np.sin(rad)
+        y_scale = np.cos(rad)
+        x_find = int(self.origin_x + meters * x_scale)
+        y_find = int(self.origin_x + meters * y_scale)
+        return x_find, y_find
+
     def _calculate_elevation_range_from_azimuth(self, azimuth: int) -> list[tuple[float, int, int]]:
         rad = azimuth * math.pi / 180
         # find height 0-1500 meters out with 10 meters step lets check later if i can make it more resolution
@@ -160,25 +171,28 @@ class MapFunction:
         print(f"Calculation Finished in {time} ms")
         self.precalculated = True
 
-    def shoot_distance(self, bearing: float, natomils: int) -> int:
+    def _interpolate_from_4points(self, ):
+        pass
+
+    def shoot_distance(self, azimuth: float, natomils: int) -> float:
         # Check Exceptions
         if natomils < 800 or natomils > 1580:
             raise ValueError(f"{natomils} is an invalid input in natomils")
-        elif bearing < 0 or bearing > 359:
-            raise ValueError(f"{bearing} is an invalid input in bearing")
+        elif azimuth < 0 or azimuth > 359:
+            raise ValueError(f"{azimuth} is an invalid input in azimuth")
 
         # If not precalculated
         if not self.precalculated:
             # approximate
-            elevation_array = self._calculate_elevation_range_from_azimuth(int(bearing))
-            return self.get_distance(natomils * 0.981719 * 0.001, elevation_array)
+            elevation_array = self._calculate_elevation_range_from_azimuth(int(azimuth))
+            return self.get_distance(natomils * 0.981719 * 0.001, elevation_array)[0]
 
         index = max(0, int((natomils - 800) / 10))
         true_natomils = float(natomils / 10)
-        true_bearing = bearing
+        true_azimuth = azimuth
 
         try:
-            value = self.precalculated_firing_solution[int(bearing)][index]
+            value = self.precalculated_firing_solution[int(azimuth)][index][0]
             print("Shoot success")
             print(value)
             return value
