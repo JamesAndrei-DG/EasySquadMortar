@@ -146,7 +146,7 @@ class MapFunction:
         x_scale = np.sin(rad)
         y_scale = np.cos(rad)
         x_find = int(self.origin_x + distance * x_scale)
-        y_find = int(self.origin_x - distance * y_scale)
+        y_find = int(self.origin_y - distance * y_scale)
         return x_find, y_find
 
     def _calculate_elevation_range_from_azimuth(self, azimuth_f: float) -> list[tuple[float, int, int]]:
@@ -207,18 +207,13 @@ class MapFunction:
 
         points = [(az1, i1 * 10), (az1, i2 * 10), (az2, i1 * 10), (az2, i2 * 10)]
 
+        value = (self.precalculated_firing_solution[az1][i1][0] + self.precalculated_firing_solution[az1][i2][0] + self.precalculated_firing_solution[az2][i1][0] + self.precalculated_firing_solution[az2][i2][0]) / 4
+        x, y = self._find_xy_from_origin(azimuth_f, value)
+
+
         try:
-            # print(f"points\n {points}")
-            # print(f"value for precalculated az1 i1 {self.precalculated_firing_solution[az1][i1][0]}")
-            # print(f"value for precalculated az1 i2 {self.precalculated_firing_solution[az1][i2][0]}")
-            # print(f"value for precalculated az2 i1 {self.precalculated_firing_solution[az2][i1][0]}")
-            # print(f"value for precalculated az2 i2 {self.precalculated_firing_solution[az2][i2][0]}")
 
-            distances = [self.precalculated_firing_solution[az1][i1][0], self.precalculated_firing_solution[az1][i2][0],
-                         self.precalculated_firing_solution[az2][i1][0], self.precalculated_firing_solution[az2][i2][0]]
 
-            meters = self._interpolate_from_4points(points, distances, azimuth_f, natomils-800)
-            x, y = self._find_xy_from_origin(azimuth_f, meters)
             # print(f"x{x}y{y}")
             return x, y
 

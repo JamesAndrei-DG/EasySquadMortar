@@ -51,7 +51,7 @@ class Maps(QObject):
 
         t1 = perf_counter()
         self.MapFunction.precalculated = False
-        value = self.MapFunction.shoot_distance(83, 1034)
+        value = self.MapFunction.shoot_distance(83.4, 1034)
         t2 = perf_counter()
         time = (t2 - t1) * 1000
         print(f"Calculation Finished in {time} ms for precalculated")
