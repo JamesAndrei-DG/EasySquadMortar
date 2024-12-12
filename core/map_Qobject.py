@@ -1,4 +1,5 @@
 import re
+from time import perf_counter
 from PySide6.QtCore import QObject, Slot, Signal
 from core.parse_maps import parsemaps
 from core.map_functions import MapFunction
@@ -41,8 +42,23 @@ class Maps(QObject):
     # For Testing
     @Slot(str)
     def target_position(self, keypad: str):
+        t1 = perf_counter()
+        value = self.MapFunction.shoot_distance(83.4, 1034)
+        t2 = perf_counter()
+        time = (t2 - t1) * 1000
+        print(f"Calculation Finished in {time} ms for precalculated")
+        print(f"value is\n {value} meters")
 
-        value = self.MapFunction.shoot_distance(83,1480)
+        t1 = perf_counter()
+        self.MapFunction.precalculated = False
+        value = self.MapFunction.shoot_distance(83, 1034)
+        t2 = perf_counter()
+        time = (t2 - t1) * 1000
+        print(f"Calculation Finished in {time} ms for precalculated")
+        print(f"value is\n {value} meters")
+
+
+
         # print(value)
         # print("Location printing: I10-5-8-5-7")
         # test = self.MapFunction.get_keypad_position("I10-5-8-5-7")

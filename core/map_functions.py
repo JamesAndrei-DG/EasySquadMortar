@@ -1,7 +1,10 @@
 import math
 import numpy as np
+from scipy.interpolate import LinearNDInterpolator
 from time import perf_counter
 import inspect
+
+import scipy.interpolate
 
 
 class MapFunction:
@@ -138,16 +141,16 @@ class MapFunction:
 
         return result
 
-    def _find_xy_from_origin(self, azimuth_f: float, meters: float) -> tuple[int, int]:
+    def _find_xy_from_origin(self, azimuth_f: float, distance: float) -> tuple[int, int]:
         rad = azimuth_f * math.pi / 180
         x_scale = np.sin(rad)
         y_scale = np.cos(rad)
-        x_find = int(self.origin_x + meters * x_scale)
-        y_find = int(self.origin_x + meters * y_scale)
+        x_find = int(self.origin_x + distance * x_scale)
+        y_find = int(self.origin_x - distance * y_scale)
         return x_find, y_find
 
-    def _calculate_elevation_range_from_azimuth(self, azimuth: int) -> list[tuple[float, int, int]]:
-        rad = azimuth * math.pi / 180
+    def _calculate_elevation_range_from_azimuth(self, azimuth_f: float) -> list[tuple[float, int, int]]:
+        rad = azimuth_f * math.pi / 180
         # find height 0-1500 meters out with 10 meters step lets check later if i can make it more resolution
         x_scale = np.sin(rad)
         y_scale = np.cos(rad)
@@ -171,31 +174,54 @@ class MapFunction:
         print(f"Calculation Finished in {time} ms")
         self.precalculated = True
 
-    def _interpolate_from_4points(self, ):
-        pass
+    def _interpolate_from_4points(self, points: list[tuple[int, int]], distances: list[float], azimuth_f: float,
+                                  natomils: int) -> float:
+        try:
+            _f = LinearNDInterpolator(points, distances)
+            distancebearing = _f(azimuth_f, natomils)
+            # print(f"distance is {distancebearing}")
+            return distancebearing
+        except Exception as error:
+            print(f"Error Encountered in {inspect.currentframe().f_code.co_name}\n{error}")
 
-    def shoot_distance(self, azimuth: float, natomils: int) -> float:
+    def shoot_distance(self, azimuth_f: float, natomils: int) -> tuple[int, int]:
         # Check Exceptions
         if natomils < 800 or natomils > 1580:
             raise ValueError(f"{natomils} is an invalid input in natomils")
-        elif azimuth < 0 or azimuth > 359:
-            raise ValueError(f"{azimuth} is an invalid input in azimuth")
+        elif azimuth_f < 0 or azimuth_f > 359:
+            raise ValueError(f"{azimuth_f} is an invalid input in azimuth")
 
         # If not precalculated
         if not self.precalculated:
             # approximate
-            elevation_array = self._calculate_elevation_range_from_azimuth(int(azimuth))
-            return self.get_distance(natomils * 0.981719 * 0.001, elevation_array)[0]
+            # print(f"Pre-calculation not done doing approximation")
+            elevation_array = self._calculate_elevation_range_from_azimuth(azimuth_f)
+            distance, x , y = self.get_distance(natomils * 0.981719 * 0.001, elevation_array)
 
-        index = max(0, int((natomils - 800) / 10))
-        true_natomils = float(natomils / 10)
-        true_azimuth = azimuth
+            return x, y
+
+        i1 = max(0, int((natomils - 800) / 10))
+        i2 = i1 + 1
+        az1 = int(azimuth_f)
+        az2 = int(azimuth_f + 1)
+
+        points = [(az1, i1 * 10), (az1, i2 * 10), (az2, i1 * 10), (az2, i2 * 10)]
 
         try:
-            value = self.precalculated_firing_solution[int(azimuth)][index][0]
-            print("Shoot success")
-            print(value)
-            return value
+            # print(f"points\n {points}")
+            # print(f"value for precalculated az1 i1 {self.precalculated_firing_solution[az1][i1][0]}")
+            # print(f"value for precalculated az1 i2 {self.precalculated_firing_solution[az1][i2][0]}")
+            # print(f"value for precalculated az2 i1 {self.precalculated_firing_solution[az2][i1][0]}")
+            # print(f"value for precalculated az2 i2 {self.precalculated_firing_solution[az2][i2][0]}")
+
+            distances = [self.precalculated_firing_solution[az1][i1][0], self.precalculated_firing_solution[az1][i2][0],
+                         self.precalculated_firing_solution[az2][i1][0], self.precalculated_firing_solution[az2][i2][0]]
+
+            meters = self._interpolate_from_4points(points, distances, azimuth_f, natomils-800)
+            x, y = self._find_xy_from_origin(azimuth_f, meters)
+            # print(f"x{x}y{y}")
+            return x, y
+
         except Exception as error:
             print(f"Error Encountered in {inspect.currentframe().f_code.co_name}\n{error}")
 
