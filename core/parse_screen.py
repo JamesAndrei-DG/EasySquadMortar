@@ -2,23 +2,10 @@ import cv2
 import easyocr
 import mss
 import numpy as np
+import sys
 
-def parse_my_screen():
-    myscreen = ParseScreen()
 
-    import time
-    fps = 30  # Set desired FPS
-    frame_time = 1 / fps
 
-    while True:
-        start_time = time.time()
-        print(myscreen.get_natomil())
-        print(myscreen.get_azimuth())
-        cv2.waitKey(1)
-        elapsed_time = time.time() - start_time
-        if elapsed_time < frame_time:
-            time.sleep(frame_time - elapsed_time)
-    cv2.destroyAllWindows()
 
 class ParseScreen:
     SCREEN_RESOLUTION = (1920, 1080)
@@ -175,3 +162,24 @@ class ParseScreen:
         except Exception as error:
             print(f"Error Encountered: {error}")
             raise Exception(f"Error Encountered: {error}")
+
+myscreen = ParseScreen()
+
+import time
+fps = 30  # Set desired FPS
+frame_time = 1 / fps
+
+while True:
+    start_time = time.time()
+    data = myscreen.get_natomil()
+    data2 = myscreen.get_azimuth()
+    sys.stdout.write(str(data))
+    sys.stdout.write(str(data2))
+    sys.stdout.flush()
+    sys.stderr.flush()
+
+    cv2.waitKey(1)
+    elapsed_time = time.time() - start_time
+    if elapsed_time < frame_time:
+        time.sleep(frame_time - elapsed_time)
+cv2.destroyAllWindows()
