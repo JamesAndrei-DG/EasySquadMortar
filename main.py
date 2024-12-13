@@ -4,8 +4,8 @@ from PySide6.QtCore import QUrl, QThread
 from PySide6.QtGui import QGuiApplication
 from PySide6.QtQml import QQmlApplicationEngine
 from PySide6.QtWebEngineQuick import QtWebEngineQuick
-from core.worker_Qthreads import ObjectFastApi, ObjectEasyOCR
-from core.map_Qobject import Maps
+from core.object_workers import ObjectFastApi, ObjectEasyOCR
+from core.map_Qobject import Map
 
 if __name__ == "__main__":
     # Initialization
@@ -33,7 +33,7 @@ if __name__ == "__main__":
     ThreadFastAPi.start()
 
     # Map Initialization
-    map = Maps()
+    map = Map()
     engine.rootContext().setContextProperty("map_name_list_py", map.get_map_names())
     engine.rootContext().setContextProperty("map_class_py", map)
 

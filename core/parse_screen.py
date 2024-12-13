@@ -4,7 +4,7 @@ import numpy as np
 import easyocr
 
 
-class ScreenOCR:
+class ParseScreen:
     SCREEN_RESOLUTION = (1920, 1080)
     AZIMUTH_SCREEN_COORDS = {"top": 1050, "left": 940, "width": 41, "height": 16}
     NATOMIL_SCREEN_COORDS = {"top": int(SCREEN_RESOLUTION[1] / 2 - 100 / 2),

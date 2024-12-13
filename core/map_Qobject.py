@@ -1,19 +1,19 @@
 import re
 from time import perf_counter
 from PySide6.QtCore import QObject, Slot, Signal
-from core.parse_maps import load_map_data
+from core.parse_maps import parse_maps
 from core.map_functions import MapFunction
 import threading
 
 
-class Maps(QObject):
+class Map(QObject):
     keypad_received = Signal(str)
 
     def __init__(self):
         super().__init__()
         self.map_names = []
         self.target_keypad = ''
-        self.map_data = load_map_data()
+        self.map_data = parse_maps()
         self.map_function = MapFunction()
 
     def get_map_names(self):
@@ -49,15 +49,15 @@ class Maps(QObject):
     @Slot(str)
     def target_position(self, keypad: str):
         t1 = perf_counter()
-        value = self.MapFunction.shoot_distance(82, 1473)
+        value = self.map_function.shoot_distance(82, 1473)
         t2 = perf_counter()
         time = (t2 - t1) * 1000
         print(f"Calculation Finished in {time} ms for precalculated")
         print(f"value is\n {value} meters")
 
         t1 = perf_counter()
-        self.MapFunction.precalculated = False
-        value = self.MapFunction.shoot_distance(82, 1473)
+        self.map_function.precalculated = False
+        value = self.map_function.shoot_distance(82, 1473)
         t2 = perf_counter()
         time = (t2 - t1) * 1000
         print(f"Calculation Finished in {time} ms for approximation")

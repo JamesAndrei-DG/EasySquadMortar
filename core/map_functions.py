@@ -1,6 +1,7 @@
 import math
 import numpy as np
 from time import perf_counter
+from scipy.interpolate import LinearNDInterpolator
 
 AZIMUTH_RANGE = 359
 GRID_SIZE = 300
@@ -139,3 +140,40 @@ class MapFunction:
             height_array.append((self.get_height(x_find, y_find), x_find, y_find))
 
         return height_array
+
+    def _interpolate_from_4points(self, points: list[tuple[int, int]], distances: list[float], azimuth_f: float,
+                                  natomils: int) -> float:
+        _f = LinearNDInterpolator(points, distances)
+        distancebearing = _f(azimuth_f, natomils)
+        if distancebearing:
+            return distancebearing
+        else:
+            raise ValueError(f"Natomils: {natomils} or Azimuth: {azimuth_f} out of bounds")
+
+def shoot_distance(self, azimuth_f: float, natomils: int) -> tuple[int, int]:
+    # Check Exceptions
+    if natomils < 800 or natomils > 1580:
+        raise ValueError(f"{natomils} is an invalid input in natomils")
+    elif azimuth_f < 0 or azimuth_f > 359:
+        raise ValueError(f"{azimuth_f} is an invalid input in azimuth")
+    try:
+        # If not precalculated
+        if not self.precalculated:
+            # approximate
+            elevation_array = self._calculate_elevation_range_from_azimuth(azimuth_f)
+            distance, x, y = self.get_distance(natomils * 0.981719 * 0.001, elevation_array)
+            return x, y
+        i1 = max(0, int((natomils - 800) / 10))
+        i2 = i1 + 1
+        az1 = int(azimuth_f)
+        az2 = int(azimuth_f + 1)
+        distance1 = (self.precalculated_firing_solution[az1][i1][0] + self.precalculated_firing_solution[az2][i1][
+            0]) / 2
+        distance2 = (self.precalculated_firing_solution[az1][i2][0] + self.precalculated_firing_solution[az2][i2][
+            0]) / 2
+        # Linear interpolation
+        distance = distance1 + (distance2 - distance1) * (natomils % 10) / 10
+        return self._find_xy_from_origin(azimuth_f, distance)
+    except Exception as error:
+        print(f"Error Encountered in shoot_distance\n{error}")
+

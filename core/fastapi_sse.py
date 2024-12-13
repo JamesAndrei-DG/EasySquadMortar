@@ -1,6 +1,5 @@
-import random
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi import FastAPI, Response
+from fastapi import FastAPI
 from fastapi.responses import StreamingResponse
 import json, uvicorn
 from asyncio import sleep, Event

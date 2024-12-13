@@ -8,7 +8,7 @@ MAP_URL_PATTERN = r'mapURL:\s*"([^"]*)"'
 MAX_ZOOM_PATTERN = r'maxZoomLevel:\s*(\d+)'
 
 
-def load_map_data() -> list:
+def parse_maps() -> list:
     with open('./assets/maps.js', 'r') as file:
         javascript_file = file.read()
 
