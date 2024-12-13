@@ -2,23 +2,42 @@ import cv2
 import easyocr
 import mss
 import numpy as np
+from multiprocessing import Pool
 
-def parse_my_screen():
-    myscreen = ParseScreen()
 
-    import time
-    fps = 30  # Set desired FPS
-    frame_time = 1 / fps
 
-    while True:
-        start_time = time.time()
-        print(myscreen.get_natomil())
-        print(myscreen.get_azimuth())
-        cv2.waitKey(1)
-        elapsed_time = time.time() - start_time
-        if elapsed_time < frame_time:
-            time.sleep(frame_time - elapsed_time)
-    cv2.destroyAllWindows()
+
+
+
+
+class Processor:
+    def __init__(self):
+        pass
+
+    def parse_my_screen(self):
+        myscreen = ParseScreen()
+        print(f"printscreen created")
+
+        import time
+        fps = 30  # Set desired FPS
+        frame_time = 1 / fps
+
+        while True:
+            start_time = time.time()
+            print(myscreen.get_natomil())
+            print(myscreen.get_azimuth())
+            cv2.waitKey(1)
+            elapsed_time = time.time() - start_time
+            if elapsed_time < frame_time:
+                time.sleep(frame_time - elapsed_time)
+        cv2.destroyAllWindows()
+
+    def parse_it_on_another_process():
+        with Pool(processes=1) as pool:
+            result = pool.apply_async(parse_my_screen())
+
+    def deleteprocess():
+
 
 class ParseScreen:
     SCREEN_RESOLUTION = (1920, 1080)
@@ -26,9 +45,8 @@ class ParseScreen:
     NATOMIL_SCREEN_COORDS = {"top": int(SCREEN_RESOLUTION[1] / 2 - 100 / 2),
                              "left": 530, "width": 60, "height": 110}
 
-    reader = easyocr.Reader(['en'])
-
     def __init__(self):
+        self.reader = easyocr.Reader(['en'])
         self.natomil_results = None
         self.box_height = [0, 0]
         self.box_position = [0, 0]

@@ -29,7 +29,7 @@ if __name__ == "__main__":
     ThreadEasyOCR.finished.connect(EasyOCR.deleteLater)
     ThreadFastAPi.finished.connect(FastApi.deleteLater)
 
-    # ThreadEasyOCR.start()
+    ThreadEasyOCR.start()
     ThreadFastAPi.start()
 
     # Map Initialization
@@ -43,5 +43,8 @@ if __name__ == "__main__":
 
     if not engine.rootObjects():
         sys.exit(-1)
+
+    ThreadEasyOCR.quit()
+    ThreadFastAPi.quit()
 
     sys.exit(app.exec())
