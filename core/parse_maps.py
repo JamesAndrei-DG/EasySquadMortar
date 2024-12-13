@@ -1,32 +1,32 @@
 import re
 
+# Constants for Regular Expression Patterns
+NAME_PATTERN = r'name:\s*"([^"]*)"'
+SIZE_PATTERN = r'size:\s*(\d+)'
+SCALING_PATTERN = r'scaling:\s*([\d\.]+)'
+MAP_URL_PATTERN = r'mapURL:\s*"([^"]*)"'
+MAX_ZOOM_PATTERN = r'maxZoomLevel:\s*(\d+)'
+
 
 def parsemaps() -> list:
     with open('./assets/maps.js', 'r') as file:
         javascript_file = file.read()
 
-    name_pattern = r'name:\s*"([^"]*)"'
-    size_pattern = r'size:\s*(\d+)'
-    scaling_pattern = r'scaling:\s*([\d\.]+)'
-    map_url_pattern = r'mapURL:\s*"([^"]*)"'
-    max_zoom_level_pattern = r'maxZoomLevel:\s*(\d+)'
+    names = re.findall(NAME_PATTERN, javascript_file)
+    sizes = re.findall(SIZE_PATTERN, javascript_file)
+    scalings = re.findall(SCALING_PATTERN, javascript_file)
+    map_urls = re.findall(MAP_URL_PATTERN, javascript_file)
+    max_zoom_levels = re.findall(MAX_ZOOM_PATTERN, javascript_file)
 
-    maps = []
-
-    name = re.findall(name_pattern, javascript_file)
-    size = re.findall(size_pattern, javascript_file)
-    scaling = re.findall(scaling_pattern, javascript_file)
-    map_url = re.findall(map_url_pattern, javascript_file)
-    max_zoom_level = re.findall(max_zoom_level_pattern, javascript_file)
-
-    for i in range(len(name)):
-        map_row = [
-            name[i],  # 0
-            int(size[i]),  # 1
-            float(scaling[i]),  # 2
-            map_url[i],  # 3
-            int(max_zoom_level[i])  # 4
+    map_data = []
+    for i in range(len(names)):
+        map_details = [
+            names[i],  # 0: Name
+            sizes[i],  # 1: Size
+            scalings[i],  # 2: Scaling
+            map_urls[i],  # 3: Map URL
+            max_zoom_levels[i]  # 4: Max Zoom Level
         ]
-        maps.append(map_row)
+        map_data.append(map_details)
 
-    return maps
+    return map_data
