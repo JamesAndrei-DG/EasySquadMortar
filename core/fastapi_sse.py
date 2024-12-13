@@ -18,9 +18,11 @@ app.add_middleware(
 
 # Pause Event Handler
 pause_for_waypoint_generator = Event()
-pause_for_waypoint_generator.set()
+pause_for_waypoint_generator.clear()
 long = 0
 lat = 0
+frequency = 4
+seconds_per_frequency = 1 / frequency
 
 
 def set_waypoint(x: int, y: int) -> None:
@@ -51,8 +53,8 @@ async def waypoints_generator() -> list:
     while True:
         await pause_for_waypoint_generator.wait()
         yield generate_event()
-        print(f"x: {long}\ny: {lat}")
-        await sleep(2)
+        print(f"x: {long} y: {lat}")
+        await sleep(seconds_per_frequency)
 
 
 @app.get("/impact-point")
