@@ -38,7 +38,7 @@ def pause() -> None:
     pause_for_waypoint_generator.clear()
 
 
-def generate_event(lat: int, long: int) -> str:
+def generate_event() -> str:
     event = "add"
     data = {
         "type": "Feature",
@@ -50,9 +50,8 @@ def generate_event(lat: int, long: int) -> str:
 
 async def waypoints_generator() -> list:
     while True:
-        set_waypoint(2544, -2808)
         await pause_for_waypoint_generator.wait()
-        yield generate_event(lat, long)
+        yield generate_event()
         print(f"x: {long}\ny: {lat}")
         await sleep(2)
 

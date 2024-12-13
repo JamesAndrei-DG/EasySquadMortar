@@ -1,9 +1,9 @@
 import cv2
 import numpy as np
 
-from core.parse_maps import parsemaps
+from core.parse_maps import load_map_data
 
-maps_array = parsemaps()
+maps_array = load_map_data()
 
 
 class Heightmap:

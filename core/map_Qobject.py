@@ -1,7 +1,7 @@
 import re
 from time import perf_counter
 from PySide6.QtCore import QObject, Slot, Signal
-from core.parse_maps import parsemaps
+from core.parse_maps import load_map_data
 from core.map_functions import MapFunction
 import threading
 
@@ -13,10 +13,13 @@ class Maps(QObject):
         super().__init__()
         self.map_names = []
         self.target_keypad = ''
-        self.map_data = parsemaps()
+        self.map_data = load_map_data()
         self.map_function = MapFunction()
 
     def get_map_names(self):
+        """
+        Parses and formats the map names from the loaded map data.
+        """
         for i, data in enumerate(self.map_data):
             self.map_names.append(data[0])
             self.map_names[i] = re.sub(r"(\w)([A-Z])|_", r"\1 \2", self.map_names[i])

@@ -1,6 +1,5 @@
 import math
 import numpy as np
-from scipy.interpolate import LinearNDInterpolator
 from time import perf_counter
 
 AZIMUTH_RANGE = 359
@@ -35,10 +34,28 @@ class MapFunction:
     def get_keypad_position(self, keypad: str) -> tuple[int, int]:
         try:
             keys = keypad.split("-")
-            x, y = self._calculate_initial_position(keys[0])
-            for i, data in enumerate(keys[1:], start=1):
-                x, y = self._update_position_with_key(data, x, y, i)
-            interval = GRID_SIZE / 3 ** (len(keys) - 1)
+            x = 0
+            y = 0
+
+            for i, data in enumerate(keys):
+                if i == 0:
+                    # Only works if it does not exceed letter z
+                    lettertonumber = ord(data[0]) - 65
+                    keypadnumber = int(data[1:3]) - 1
+
+                    x = 300 * int(lettertonumber)
+                    y = 300 * int(keypadnumber)
+
+                else:
+                    data = int(data)
+                    x_between = (data - 1) % 3
+                    y_between = 2 - ((data - 1) // 3)
+                    interval = 300 / 3 ** i
+
+                    x += x_between * interval
+                    y += y_between * interval
+
+            interval = 300 / 3 ** (len(keys) - 1)
             x += interval / 2
             y += interval / 2
             return int(x), int(y)
@@ -57,9 +74,25 @@ class MapFunction:
 
     def get_distance(self, rad: float, elevation_array: list[tuple[float, int, int]]) -> tuple[float, int, int]:
         origin_elevation = self.get_height(self.origin_x, self.origin_y)
-        time = max(14, 21 - int((rad - 0.82) / 0.08))
+        if rad > 1.36:
+            time = 21
+        elif rad > 1.22:
+            time = 20
+        elif rad > 1.11:
+            time = 19
+        elif rad > 1.03:
+            time = 18
+        elif rad > 0.95:
+            time = 17
+        elif rad > 0.87:
+            time = 16
+        elif rad > 0.82:
+            time = 15
+        else:
+            time = 14
         velocity = 110
-        vx, vy = velocity * math.cos(rad), velocity * math.sin(rad)
+        vx = velocity * math.cos(rad)
+        vy = velocity * math.sin(rad)
         step = 0.01
 
         try:
@@ -67,7 +100,7 @@ class MapFunction:
                 time += step
                 distance = vx * time
                 elevation = origin_elevation + vy * time - 0.5 * 9.81 * time ** 2
-                find_d = round(distance / 10)
+                find_d = round(distance / 10)  # it will cause error if it is negative
                 if elevation <= elevation_array[find_d][0]:
                     x_pos, y_pos = elevation_array[find_d][1:]
                     return distance, x_pos, y_pos
@@ -75,36 +108,34 @@ class MapFunction:
             print(f"Error in get_distance: {error}")
             raise
 
-    def _calculate_initial_position(self, key: str) -> tuple[int, int]:
-        letter_value = ord(key[0].upper()) - 65
-        keypad_number = int(key[1:]) - 1
-        x = GRID_SIZE * letter_value
-        y = GRID_SIZE * keypad_number
-        return x, y
-
-    def _update_position_with_key(self, key: str, x: int, y: int, depth: int) -> tuple[int, int]:
-        data = int(key)
-        x_offset = (data - 1) % 3
-        y_offset = 2 - ((data - 1) // 3)
-        interval = GRID_SIZE / 3 ** depth
-        x += x_offset * interval
-        y += y_offset * interval
-        return x, y
-
     def _precalculate_firing_solution(self) -> None:
         self.precalculated = False
-        print("Precalculating firing solution...")
+        print("Precalculating firing solution")
         t1 = perf_counter()
-        for azimuth in range(AZIMUTH_RANGE):
-            distances = self._calculate_all_possible_distances_from_azimuth(azimuth)
-            self.precalculated_firing_solution.append(distances)
+        for azimuth in range(359):
+            self.precalculated_firing_solution.append(self._calculate_all_possible_distances_from_azimuth(azimuth))
         t2 = perf_counter()
-        print(f"Precalculation finished in {(t2 - t1) * 1000:.2f} ms")
+        time = (t2 - t1) * 1000
+        print(f"Calculation Finished in {time} ms")
         self.precalculated = True
 
     def _calculate_all_possible_distances_from_azimuth(self, azimuth: int) -> list[tuple[float, int, int]]:
+        result = []
         elevation_range = self._calculate_elevation_range_from_azimuth(azimuth)
-        return [
-            self.get_distance(natomil * 0.981719 * 0.001, elevation_range)
-            for natomil in range(800, 1581, 10)
-        ]
+        for natomil in range(800, 1580 + 1, 10):
+            result.append(self.get_distance((natomil * 0.981719 * 0.001), elevation_range))
+        return result
+
+    def _calculate_elevation_range_from_azimuth(self, azimuth: int) -> list[tuple[float, int, int]]:
+        rad = azimuth * math.pi / 180
+        # find height 0-1500 meters out with 10 meters step lets check later if I can make it more resolution
+        x_scale = np.sin(rad)
+        y_scale = np.cos(rad)
+        height_array = []
+
+        for meters in range(0, 1500, 10):
+            x_find = int(self.origin_x + meters * x_scale)
+            y_find = int(self.origin_y - meters * y_scale)  # Needs to be inverted
+            height_array.append((self.get_height(x_find, y_find), x_find, y_find))
+
+        return height_array
