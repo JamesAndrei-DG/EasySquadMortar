@@ -8,7 +8,7 @@ from asyncio import sleep, Event
 # Initialization
 app = FastAPI()
 
-# Added middleware to prevent the frontend from causing error
+# Middleware Configuration
 app.add_middleware(
     CORSMiddleware,  # type hint bug https://github.com/fastapi/fastapi/discussions/10968
     allow_origins=["*"],
@@ -17,7 +17,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# PauseEventhandler
+# Pause Event Handler
 pause_for_waypoint_generator = Event()
 pause_for_waypoint_generator.set()
 long = 0
@@ -26,38 +26,35 @@ lat = 0
 
 def set_waypoint(x: int, y: int) -> None:
     global long, lat
-    long = long
-    lat = lat
+    long = x
+    lat = y
 
 
 def resume() -> None:
     pause_for_waypoint_generator.set()
-    pass
 
 
 def pause() -> None:
     pause_for_waypoint_generator.clear()
-    pass
+
+
+def generate_event(lat: int, long: int) -> str:
+    event = "add"
+    data = {
+        "type": "Feature",
+        "geometry": {"type": "Point", "coordinates": [lat, long]},
+        "properties": {"id": 1, "lat": lat, "lon": long},
+    }
+    return f"event: {event}\ndata: {json.dumps(data)}\n\n"
 
 
 async def waypoints_generator() -> list:
     while True:
-        set_waypoint(1, 2)
+        set_waypoint(2544, -2808)
         await pause_for_waypoint_generator.wait()
-
-        event = "add"
-        data = {
-            "type": "Feature",
-            "geometry": {"type": "Point", "coordinates": [lat, long]},
-            "properties": {"id": 1, "lat": lat, "lon": long},
-        }
-
-        formatted_event = (f"event: {event}\n"
-                           f"data: {json.dumps(data)}\n\n")
-
-        yield formatted_event
+        yield generate_event(lat, long)
         print(f"x: {long}\ny: {lat}")
-        await sleep(5)
+        await sleep(2)
 
 
 @app.get("/impact-point")
