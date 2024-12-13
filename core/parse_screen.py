@@ -3,6 +3,22 @@ import easyocr
 import mss
 import numpy as np
 
+def parse_my_screen():
+    myscreen = ParseScreen()
+
+    import time
+    fps = 30  # Set desired FPS
+    frame_time = 1 / fps
+
+    while True:
+        start_time = time.time()
+        print(myscreen.get_natomil())
+        print(myscreen.get_azimuth())
+        cv2.waitKey(1)
+        elapsed_time = time.time() - start_time
+        if elapsed_time < frame_time:
+            time.sleep(frame_time - elapsed_time)
+    cv2.destroyAllWindows()
 
 class ParseScreen:
     SCREEN_RESOLUTION = (1920, 1080)

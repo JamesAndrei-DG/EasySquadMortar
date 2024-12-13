@@ -11,6 +11,7 @@ test*
 # File Exempt
 
 # Folder
+.idea/
 tests/*
 qt/components/maps/*
 # Folder Exempt
