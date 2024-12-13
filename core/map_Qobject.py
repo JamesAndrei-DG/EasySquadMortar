@@ -10,12 +10,11 @@ class Maps(QObject):
     keypad_received = Signal(str)
 
     def __init__(self):
-        QObject.__init__(self)
+        super().__init__()
         self.map_names = []
         self.target_keypad = ''
-
         self.map_data = parsemaps()
-        self.MapFunction = MapFunction()
+        self.map_function = MapFunction()
 
     def get_map_names(self):
         for i, data in enumerate(self.map_data):
@@ -24,26 +23,30 @@ class Maps(QObject):
 
         return self.map_names
 
-    @Slot(str)
+    @Slot(int)  # Fixed the type annotation for map_index
     def selected_map(self, map_index: int):
-        # Need a way to check for exceptions/errors
-        # Might need to add this to a thread if it is still hang
-        print(f"Selected map index: {map_index}")
-        self.MapFunction.change_map(map_index)
+        """
+        Handles user selection of a map.
+        """
+        try:
+            print(f"Selected map index: {map_index}")
+            self.map_function.change_map(map_index)
+        except Exception as error:  # Added exception handling
+            print(f"Error encountered when selecting map: {error}")
 
     @Slot(str)
     def mortar_position(self, keypad: str):
+        """
+        Sets the mortar's origin using the given keypad.
+        Executes the action in a new thread.
+        """
         print(f"Origin is: {keypad}")
-        thread = threading.Thread(target=self.MapFunction.set_origin_keypad, args=(keypad,))
-        thread.start()
+        threading.Thread(target=self.map_function.set_origin_keypad, args=(keypad,)).start()
 
-        # self.MapFunction.set_origin_keypad(keypad)
-
-    # For Testing
     @Slot(str)
     def target_position(self, keypad: str):
         t1 = perf_counter()
-        value = self.MapFunction.shoot_distance(83.4, 1034)
+        value = self.MapFunction.shoot_distance(82, 1473)
         t2 = perf_counter()
         time = (t2 - t1) * 1000
         print(f"Calculation Finished in {time} ms for precalculated")
@@ -51,10 +54,10 @@ class Maps(QObject):
 
         t1 = perf_counter()
         self.MapFunction.precalculated = False
-        value = self.MapFunction.shoot_distance(83.4, 1034)
+        value = self.MapFunction.shoot_distance(82, 1473)
         t2 = perf_counter()
         time = (t2 - t1) * 1000
-        print(f"Calculation Finished in {time} ms for precalculated")
+        print(f"Calculation Finished in {time} ms for approximation")
         print(f"value is\n {value} meters")
 
 
