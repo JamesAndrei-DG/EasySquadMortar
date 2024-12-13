@@ -8,14 +8,12 @@ from core.worker_Qthreads import ObjectFastApi, ObjectEasyOCR
 from core.map_Qobject import Maps
 
 if __name__ == "__main__":
-
     # Initialization
     QtWebEngineQuick.initialize()
     app = QGuiApplication(sys.argv)
-
     engine = QQmlApplicationEngine()
 
-    # Qthread
+    # Threads and Objects
     ThreadEasyOCR = QThread()
     ThreadFastAPi = QThread()
 
@@ -25,25 +23,21 @@ if __name__ == "__main__":
     EasyOCR.moveToThread(ThreadEasyOCR)
     FastApi.moveToThread(ThreadFastAPi)
 
-    ThreadEasyOCR.started.connect(EasyOCR.run_EasyOCR)
-    ThreadFastAPi.started.connect(FastApi.run_FastApi)
+    ThreadEasyOCR.started.connect(EasyOCR.run_easyocr)
+    ThreadFastAPi.started.connect(FastApi.run_fast_api_server)
+
+    ThreadEasyOCR.finished.connect(EasyOCR.deleteLater)
+    ThreadFastAPi.finished.connect(FastApi.deleteLater)
 
     # ThreadEasyOCR.start()
-    # ThreadFastAPi.start()
+    ThreadFastAPi.start()
 
-
-    # Map Class
+    # Map Initialization
     map = Maps()
     engine.rootContext().setContextProperty("map_name_list_py", map.get_map_names())
     engine.rootContext().setContextProperty("map_class_py", map)
 
-    # Clean up
-    ThreadEasyOCR.finished.connect(EasyOCR.deleteLater)
-    ThreadFastAPi.finished.connect(FastApi.deleteLater)
-
-
-
-    # Load Qml
+    # Load QML File
 
     engine.load((QUrl("qt/root.qml")))
 
