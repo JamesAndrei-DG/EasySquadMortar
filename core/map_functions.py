@@ -217,7 +217,7 @@ class MapFunction:
         Precalculates the firing solution for all azimuth angles and stores the results.
         
         This method initializes the firing solution calculation, iterates over all azimuth
-        angles from 0 to 358, and appends the results of distance calculations for each azimuth.
+        angles from 0 to 359, and appends the results of distance calculations for each azimuth.
         The process is timed and the duration is printed for performance measurement.
         
         The `precalculated` attribute is set to False before calculation starts and set to True
@@ -226,7 +226,7 @@ class MapFunction:
         self.precalculated = False
         print("Precalculating firing solution")
         t1 = perf_counter()
-        for azimuth in range(359):
+        for azimuth in range(360):
             self.precalculated_firing_solution.append(self._calculate_all_possible_distances_from_azimuth(azimuth))
         t2 = perf_counter()
         time = (t2 - t1) * 1000
@@ -274,7 +274,7 @@ class MapFunction:
         y_scale = np.cos(rad)
         height_array = []
 
-        for meters in range(0, 1500, 10):
+        for meters in range(0, 1500+1, 10):
             x_find = int(self.origin_x + meters * x_scale)
             y_find = int(self.origin_y - meters * y_scale)  # Needs to be inverted
             height_array.append((self.get_height(x_find, y_find), x_find, y_find))

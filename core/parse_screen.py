@@ -1,7 +1,7 @@
-import mss
 import cv2
-import numpy as np
 import easyocr
+import mss
+import numpy as np
 
 
 class ParseScreen:
@@ -23,6 +23,18 @@ class ParseScreen:
         print(f"Initializing Screen OCR with EasyOCR model")
 
     def get_azimuth(self) -> float:
+        """
+        Retrieves the azimuth value detected via OCR.
+        
+        This method utilizes the OCR results to determine the azimuth displayed on
+        the screen. If a valid azimuth is detected, it updates the buffer with the
+        latest value and returns it. If the OCR fails to detect a value, it falls
+        back to the buffered azimuth as a fail-safe mechanism.
+        
+        Returns:
+            float: The detected azimuth value if successful, or the buffered value
+                   from a previous detection.
+        """
         azimuth = self.get_azimuth_ocr_results()
         if azimuth:
             self.buffer_azimuth = azimuth
@@ -30,9 +42,20 @@ class ParseScreen:
         return self.buffer_azimuth
 
     def get_natomil(self) -> int:
+        """
+        Retrieves the NatoMil value detected via OCR.
+        
+        This function calculates the approximate NatoMil value based on OCR results.
+        If the obtained value falls within the valid range (800 to 1580), it updates 
+        the buffer with the latest value and returns it. If the value is invalid or 
+        OCR fails to detect a value, the buffered NatoMil value from a previous 
+        detection is returned.
+        
+        Returns:
+            int: The detected NatoMil value within the valid range, or the last buffered value.
+        """
         value = self.approximate_natomil()
         if value:
-
             if 800 <= int(value) <= 1580:
                 self.buffer_natomil = value
                 return value
@@ -41,6 +64,19 @@ class ParseScreen:
         return self.buffer_natomil
 
     def get_azimuth_ocr_results(self) -> float:
+        """
+        Captures the azimuth area of the screen and processes it with EasyOCR 
+        to detect numerical values representing the azimuth.
+        
+        This method uses the specified screen coordinates to capture the screen 
+        region where azimuth information is displayed. The captured image is 
+        converted to grayscale, threshold to create a binary image, and then 
+        passed to EasyOCR for text recognition. 
+        
+        Returns:
+            float: The detected azimuth value as a float if recognized, 
+            or an empty list if detection fails.
+        """
         with mss.mss() as sct:
             screenshot = sct.grab(self.AZIMUTH_SCREEN_COORDS)
             img_gray = cv2.cvtColor(np.asarray(screenshot, dtype=np.uint8), cv2.COLOR_BGRA2GRAY)
@@ -51,7 +87,21 @@ class ParseScreen:
 
             return self.reader.readtext(azimuth_monochrome, allowlist=".0123456789", detail=0)
 
-    def get_natomil_ocr_results(self) -> list:  # this will return easyocr results for mil
+    def get_natomil_ocr_results(self) -> list:
+        """
+        Captures the NatoMil section of the screen and processes it using EasyOCR 
+        to detect numerical values representing the NatoMil.
+        
+        This method uses the specified screen coordinates to capture the screen 
+        region where azimuth information is displayed. The captured image is 
+        converted to grayscale, threshold to create a binary image, and then 
+        passed to EasyOCR for text recognition. 
+        
+        Returns:
+            list: A list of detected text elements from EasyOCR, where each element 
+                  is a list containing bounding box coordinates, detected text, 
+                  and detection confidence.
+        """
         with mss.mss() as sct:
             screenshot = sct.grab(self.NATOMIL_SCREEN_COORDS)
             img_gray = cv2.cvtColor(np.asarray(screenshot, dtype=np.uint8), cv2.COLOR_BGRA2GRAY)
@@ -64,6 +114,16 @@ class ParseScreen:
                                         low_text=0.2, link_threshold=0.2)
 
     def approximate_natomil(self) -> int:
+        """
+         Approximates the NatoMil value from OCR results.
+
+         This function processes detected bounding boxes and their attributes from OCR results
+         to calculate the NatoMil value. It uses differences in box positions and a calibration
+         factor (pixels per NatoMil) for approximation.
+
+         Returns:
+             int: The approximated NatoMil value or 0 if an error occurs.
+         """
         try:
             natomil_results = self.get_natomil_ocr_results()
             for index, number in enumerate(natomil_results):

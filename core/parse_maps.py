@@ -9,6 +9,17 @@ MAX_ZOOM_PATTERN = r'maxZoomLevel:\s*(\d+)'
 
 
 def parse_maps() -> list:
+    """
+    Parses the maps.js file to extract map details such as names, sizes, scalings, URLs, and max zoom levels.
+
+    Returns:
+        list: A list of maps, where each map is represented as a list containing the following information:
+            - Name (str): The name of the map.
+            - Size (str): The size of the map.
+            - Scaling (str): The scaling factor of the map.
+            - Map URL (str): The URL of the map image.
+            - Max Zoom Level (str): The maximum zoom level of the map.
+    """
     with open('./assets/maps.js', 'r') as file:
         javascript_file = file.read()
 
