@@ -2,21 +2,17 @@ import cv2
 import easyocr
 import mss
 import numpy as np
-from multiprocessing import Pool
-
-
-
-
-
+from multiprocessing import Pool, Process, Value
 
 
 class Processor:
     def __init__(self):
-        pass
-
-    def parse_my_screen(self):
-        myscreen = ParseScreen()
+        self.myscreen = ParseScreen()
         print(f"printscreen created")
+        self.natomil = Value('d', 0)
+        self.azimuth = Value('d', 0.0)
+
+    def parse_my_screen(self, natomil: int, bearing: float):
 
         import time
         fps = 30  # Set desired FPS
@@ -24,19 +20,24 @@ class Processor:
 
         while True:
             start_time = time.time()
-            print(myscreen.get_natomil())
-            print(myscreen.get_azimuth())
+            self.myscreen.get_natomil()
+            self.myscreen.get_azimuth()
             cv2.waitKey(1)
             elapsed_time = time.time() - start_time
             if elapsed_time < frame_time:
                 time.sleep(frame_time - elapsed_time)
         cv2.destroyAllWindows()
 
-    def parse_it_on_another_process():
+    def parse_it_on_another_process(self):
         with Pool(processes=1) as pool:
-            result = pool.apply_async(parse_my_screen())
+            pool.apply_async(self.parse_my_screen, self.natomil, self.azimuth)
 
-    def deleteprocess():
+    def parse_me_another(self):
+        test = Process(target=self.parse_my_screen, args=(self.natomil, self.azimuth))
+        test.start()
+
+    def deleteprocess(self):
+        pass
 
 
 class ParseScreen:
@@ -193,3 +194,6 @@ class ParseScreen:
         except Exception as error:
             print(f"Error Encountered: {error}")
             raise Exception(f"Error Encountered: {error}")
+
+if __name__ == "__main__":
+    pass
