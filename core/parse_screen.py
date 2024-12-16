@@ -9,7 +9,6 @@ import mss
 import numpy as np
 
 
-
 def parse_on_another_process(azimuth: Synchronized[ctypes.c_float], natomil: Synchronized[ctypes.c_uint16]) -> None:
     """
     Parses data on a separate process using the provided synchronized shared memory values for communication.
@@ -87,11 +86,11 @@ class ParseScreen:
             return float(azimuth[0])
         except IndexError:
             print("Make sure squad game is in focus")
-            time.sleep(1)
+            time.sleep(2)
             return self.buffer_azimuth
         except TypeError:
             print("Make sure squad game is in focus")
-            time.sleep(1)
+            time.sleep(2)
             return self.buffer_azimuth
         except Exception as error:
             raise Exception(f"Error Encountered in get_azimuth:\n{error}")
@@ -118,12 +117,8 @@ class ParseScreen:
             else:
                 return self.buffer_natomil
         except IndexError:
-            print("Make sure squad game is in focus")
-            time.sleep(1)
             return self.buffer_natomil
         except TypeError:
-            print("Make sure squad game is in focus")
-            time.sleep(1)
             return self.buffer_natomil
         except Exception as error:
             raise Exception(f"Error Encountered in get_natomil:\n{error}")
@@ -194,7 +189,6 @@ class ParseScreen:
             if not natomil_results:
                 time.sleep(1)
                 raise ValueError("natomil is empty")
-                
 
             for index, number in enumerate(natomil_results):
                 top_left_y_axis = number[0][0][1]
