@@ -1,6 +1,6 @@
 from __future__ import annotations
 import time
-from multiprocessing import Process, Value
+from multiprocessing import Process
 from multiprocessing.sharedctypes import Synchronized
 import ctypes
 import cv2
@@ -11,12 +11,43 @@ import numpy as np
 
 
 def parse_on_another_process(azimuth: Synchronized[ctypes.c_float], natomil: Synchronized[ctypes.c_uint16]) -> None:
+    """
+    Parses data on a separate process using the provided synchronized shared memory values for communication.
+
+    This function utilizes the multiprocessing library to create and start a new process that runs the
+    internal `_parse_my_screen` function. It uses the given synchronized shared memory objects as arguments
+    to facilitate inter-process communication. This approach allows for asynchronous execution while
+    ensuring thread-safe modification of shared state.
+
+    Arguments:
+        azimuth: A synchronized shared memory object containing a `ctypes.c_float` value. It is used
+                 to provide the azimuth data that will be processed by the target function.
+        natomil: A synchronized shared memory object containing a `ctypes.c_uint16` value. It acts
+                 as a communication object for handling natomil-related data during the execution
+                 of the process.
+
+    """
     proc = Process(target=_parse_my_screen, args=(azimuth, natomil))
     print("Starting Process")
     proc.start()
 
 
 def _parse_my_screen(azimuth: Synchronized[ctypes.c_float], natomil: Synchronized[ctypes.c_uint16]):
+    """
+    Retrieves and updates azimuth and natomil values in a loop.
+
+    This function continuously processes data using a ParseScreen
+    instance to fetch updated values of azimuth and natomil and assigns
+    them to shared Synchronized objects for inter-process communication.
+
+    Parameters:
+        azimuth (Synchronized[ctypes.c_float]): A synchronized float variable
+        that will be updated with the azimuth value fetched from the parser.
+
+        natomil (Synchronized[ctypes.c_uint16]): A synchronized unsigned 16-bit
+        integer variable that will be updated with the natomil value fetched
+        from the parser.
+    """
     parser = ParseScreen()
     print("Running Process")
     while True:
@@ -79,7 +110,7 @@ class ParseScreen:
             int: The natomil value acquired from the OCR results.
 
         """
-        value = self.approximate_natomil()
+        value = self._approximate_natomil()
         try:
             if 800 <= int(value) <= 1580:
                 self.buffer_natomil = int(value)
@@ -121,7 +152,7 @@ class ParseScreen:
 
             return self.reader.readtext(azimuth_monochrome, allowlist=".0123456789", detail=0)
 
-    def get_natomil_ocr_results(self) -> list:
+    def _get_natomil_ocr_results(self) -> list:
         """
         Captures the NatoMil section of the screen and processes it using EasyOCR 
         to detect numerical values representing the NatoMil.
@@ -147,7 +178,7 @@ class ParseScreen:
             return self.reader.readtext(natomil_monochrome, allowlist="0123456789", mag_ratio=2, text_threshold=0.80,
                                         low_text=0.2, link_threshold=0.2)
 
-    def approximate_natomil(self) -> int:
+    def _approximate_natomil(self) -> int:
         """
          Approximates the NatoMil value from OCR results.
 
@@ -159,7 +190,7 @@ class ParseScreen:
              int: The approximated NatoMil value or 0 if an error occurs.
          """
         try:
-            natomil_results = self.get_natomil_ocr_results()
+            natomil_results = self._get_natomil_ocr_results()
             if not natomil_results:
                 time.sleep(1)
                 raise ValueError("natomil is empty")
