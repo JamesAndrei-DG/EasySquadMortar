@@ -1,116 +1,115 @@
+from __future__ import annotations
+import time
+from multiprocessing import Process, Value
+from multiprocessing.sharedctypes import Synchronized
+import ctypes
 import cv2
 import easyocr
 import mss
 import numpy as np
-from multiprocessing import Pool, Process, Value
 
 
-class Processor:
-    def __init__(self):
-        self.myscreen = ParseScreen()
-        print(f"printscreen created")
-        self.natomil = Value('d', 0)
-        self.azimuth = Value('d', 0.0)
 
-    def parse_my_screen(self, natomil: int, bearing: float):
+def parse_on_another_process(azimuth: Synchronized[ctypes.c_float], natomil: Synchronized[ctypes.c_uint16]) -> None:
+    proc = Process(target=_parse_my_screen, args=(azimuth, natomil))
+    print("Starting Process")
+    proc.start()
 
-        import time
-        fps = 30  # Set desired FPS
-        frame_time = 1 / fps
 
-        while True:
-            start_time = time.time()
-            self.myscreen.get_natomil()
-            self.myscreen.get_azimuth()
-            cv2.waitKey(1)
-            elapsed_time = time.time() - start_time
-            if elapsed_time < frame_time:
-                time.sleep(frame_time - elapsed_time)
-        cv2.destroyAllWindows()
-
-    def parse_it_on_another_process(self):
-        with Pool(processes=1) as pool:
-            pool.apply_async(self.parse_my_screen, self.natomil, self.azimuth)
-
-    def parse_me_another(self):
-        test = Process(target=self.parse_my_screen, args=(self.natomil, self.azimuth))
-        test.start()
-
-    def deleteprocess(self):
-        pass
+def _parse_my_screen(azimuth: Synchronized[ctypes.c_float], natomil: Synchronized[ctypes.c_uint16]):
+    parser = ParseScreen()
+    print("Running Process")
+    while True:
+        azimuth.value = parser.get_azimuth()
+        natomil.value = parser.get_natomil()
 
 
 class ParseScreen:
-    SCREEN_RESOLUTION = (1920, 1080)
-    AZIMUTH_SCREEN_COORDS = {"top": 1050, "left": 940, "width": 41, "height": 16}
-    NATOMIL_SCREEN_COORDS = {"top": int(SCREEN_RESOLUTION[1] / 2 - 100 / 2),
-                             "left": 530, "width": 60, "height": 110}
 
     def __init__(self):
-        self.reader = easyocr.Reader(['en'])
+        self.SCREEN_RESOLUTION = (1920, 1080)
+        self.AZIMUTH_SCREEN_COORDS = {"top": 1050, "left": 940, "width": 41, "height": 16}
+        self.NATOMIL_SCREEN_COORDS = {"top": int(self.SCREEN_RESOLUTION[1] / 2 - 100 / 2),
+                                      "left": 530, "width": 60, "height": 110}
+
+        self.reader = easyocr.Reader(['en'], gpu=False)
         self.natomil_results = None
         self.box_height = [0, 0]
         self.box_position = [0, 0]
         self.box_difference = None
         self.pixel_per_natomil = 5
         self.buffer_natomil = 0
-        self.buffer_azimuth = 0
+        self.buffer_azimuth = 0.0
         print(f"Initializing Screen OCR with EasyOCR model")
 
     def get_azimuth(self) -> float:
         """
-        Retrieves the azimuth value detected via OCR.
-        
-        This method utilizes the OCR results to determine the azimuth displayed on
-        the screen. If a valid azimuth is detected, it updates the buffer with the
-        latest value and returns it. If the OCR fails to detect a value, it falls
-        back to the buffered azimuth as a fail-safe mechanism.
+        Retrieves the azimuth value using easyocr from game output. 
+        It updates the buffer for azimuth and returns the retrieved azimuth value as a float.
         
         Returns:
-            float: The detected azimuth value if successful, or the buffered value
-                   from a previous detection.
+            float: The azimuth angle acquired from the OCR results.
         """
-        azimuth = self.get_azimuth_ocr_results()
-        if azimuth:
-            self.buffer_azimuth = azimuth
-            return azimuth
-        return self.buffer_azimuth
+        azimuth = self._get_azimuth_ocr_results()
+        try:
+            self.buffer_azimuth = float(azimuth[0])
+            return float(azimuth[0])
+        except IndexError:
+            print("Make sure squad game is in focus")
+            time.sleep(1)
+            return self.buffer_azimuth
+        except TypeError:
+            print("Make sure squad game is in focus")
+            time.sleep(1)
+            return self.buffer_azimuth
+        except Exception as error:
+            raise Exception(f"Error Encountered in get_azimuth:\n{error}")
 
     def get_natomil(self) -> int:
         """
-        Retrieves the NatoMil value detected via OCR.
-        
-        This function calculates the approximate NatoMil value based on OCR results.
-        If the obtained value falls within the valid range (800 to 1580), it updates 
-        the buffer with the latest value and returns it. If the value is invalid or 
-        OCR fails to detect a value, the buffered NatoMil value from a previous 
-        detection is returned.
-        
+        Retrieves the Natomil value using easyocr from game output.
+
+        This function calculates the 'Natomil' value by calling the
+        `approximate_natomil` method. It validates the result to ensure
+        it falls within the expected range. If validation is successful,
+        the value is returned and stored for future use. If the validation
+        fails, a previously stored buffer value is returned. 
+
         Returns:
-            int: The detected NatoMil value within the valid range, or the last buffered value.
+            int: The natomil value acquired from the OCR results.
+
         """
         value = self.approximate_natomil()
-        if value:
+        try:
             if 800 <= int(value) <= 1580:
-                self.buffer_natomil = value
-                return value
+                self.buffer_natomil = int(value)
+                return int(value)
             else:
-                return 0
-        return self.buffer_natomil
+                return self.buffer_natomil
+        except IndexError:
+            print("Make sure squad game is in focus")
+            time.sleep(1)
+            return self.buffer_natomil
+        except TypeError:
+            print("Make sure squad game is in focus")
+            time.sleep(1)
+            return self.buffer_natomil
+        except Exception as error:
+            raise Exception(f"Error Encountered in get_natomil:\n{error}")
 
-    def get_azimuth_ocr_results(self) -> float:
+    def _get_azimuth_ocr_results(self) -> list:
         """
-        Captures the azimuth area of the screen and processes it with EasyOCR 
-        to detect numerical values representing the azimuth.
+        Captures the azimuth section of the screen and processes it using EasyOCR 
+        to detect numerical values representing the NatoMil.
         
         This method uses the specified screen coordinates to capture the screen 
         region where azimuth information is displayed. The captured image is 
         converted to grayscale, threshold to create a binary image, and then 
         passed to EasyOCR for text recognition. 
-        
+
         Returns:
-            float: The detected azimuth value as a float if recognized, 
-            or an empty list if detection fails.
+            list: A list of detected numeric text strings from the processed screen region.
+
         """
         with mss.mss() as sct:
             screenshot = sct.grab(self.AZIMUTH_SCREEN_COORDS)
@@ -118,7 +117,7 @@ class ParseScreen:
             thresh, azimuth_monochrome = cv2.threshold(img_gray, 170, 255, cv2.THRESH_BINARY)
 
             # For Visualization
-            # cv2.imshow("Azimuth Screen Capture", img_monochrome)
+            # cv2.imshow("Azimuth Screen Capture", azimuth_monochrome)
 
             return self.reader.readtext(azimuth_monochrome, allowlist=".0123456789", detail=0)
 
@@ -161,6 +160,11 @@ class ParseScreen:
          """
         try:
             natomil_results = self.get_natomil_ocr_results()
+            if not natomil_results:
+                time.sleep(1)
+                raise ValueError("natomil is empty")
+                
+
             for index, number in enumerate(natomil_results):
                 top_left_y_axis = number[0][0][1]
                 bot_left_y_axis = number[0][3][1]
@@ -182,8 +186,8 @@ class ParseScreen:
                     if number[2] >= 0.8:  # if it goes to 800 it no longer goes over 0.8 confidence
                         natomil = int(number[1]) + int((self.box_position[0] - 50) / self.pixel_per_natomil)
                         # this should return the approximate mil calculated from the pixel difference and the mil detected
-
                         return natomil
+
         except IndexError as error:
             print(f"Index Error Encountered: {error}")
             print(f"Make sure squad game is in focus")
@@ -192,8 +196,8 @@ class ParseScreen:
             print(f"Value Error Encountered: {error}")
             return 0
         except Exception as error:
-            print(f"Error Encountered: {error}")
             raise Exception(f"Error Encountered: {error}")
+
 
 if __name__ == "__main__":
     pass
