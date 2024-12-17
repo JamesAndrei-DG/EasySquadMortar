@@ -14,6 +14,7 @@ test*
 .idea/
 tests/*
 qt/components/maps/*
+dist/
 # Folder Exempt
 !qt/components/maps/javascript/
 
