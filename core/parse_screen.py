@@ -31,12 +31,12 @@ def parse_on_another_process(azimuth: Synchronized[ctypes.c_float], natomil: Syn
                  as a communication object for handling natomil-related data during the execution
                  of the process.
     """
-    proc = Process(target=_parse_my_screen, args=(azimuth, natomil))
+    proc = Process(target=parse_my_screen, args=(azimuth, natomil))
     print("Starting Process")
     proc.start()
 
 
-def _parse_my_screen(azimuth: Synchronized[ctypes.c_float], natomil: Synchronized[ctypes.c_uint16]):
+def parse_my_screen(azimuth: Synchronized[ctypes.c_float], natomil: Synchronized[ctypes.c_uint16]):
     """
     Retrieves and updates azimuth and natomil values in a loop.
 

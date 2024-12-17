@@ -7,6 +7,24 @@ from PySide6.QtWebEngineQuick import QtWebEngineQuick
 from core.object_workers import ObjectFastApi, ObjectEasyOCR
 from core.map_Qobject import Map
 
+
+def thread_close() -> None:
+    """
+    Handles the closing operation of the application, including terminating threads
+    and ensuring proper cleanup. This function stops and waits for the shutdown of
+    the threads used by the application to ensure smooth and safe termination.
+
+    """
+    print("Application is closing. Cleaning up...")
+    #Stop EasyOcr while loop
+    EasyOCR._running = False
+    ThreadEasyOCR.terminate()
+    ThreadFastAPi.terminate()
+    ThreadEasyOCR.wait()
+    ThreadFastAPi.wait(2000) #Cant close Uvicorn gracefully
+    print("Threads have been stopped.")
+
+
 if __name__ == "__main__":
     # Initialization
     QtWebEngineQuick.initialize()
@@ -26,9 +44,6 @@ if __name__ == "__main__":
     ThreadEasyOCR.started.connect(EasyOCR.run_easyocr)
     ThreadFastAPi.started.connect(FastApi.run_fast_api_server)
 
-    ThreadEasyOCR.finished.connect(EasyOCR.deleteLater)
-    ThreadFastAPi.finished.connect(FastApi.deleteLater)
-
     ThreadEasyOCR.start()
     ThreadFastAPi.start()
 
@@ -41,10 +56,10 @@ if __name__ == "__main__":
 
     engine.load((QUrl("qt/root.qml")))
 
+    # Close Thread on Exit
+    app.aboutToQuit.connect(thread_close)
+
     if not engine.rootObjects():
         sys.exit(-1)
-
-    ThreadEasyOCR.quit()
-    ThreadFastAPi.quit()
 
     sys.exit(app.exec())
