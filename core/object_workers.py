@@ -17,7 +17,15 @@ class ObjectEasyOCR(QObject):
         self._running = True
 
     def run_easyocr(self) -> None:
-        """Runs the screen parser on another screen."""
+        """
+        Runs the EasyOCR process in a separate thread and manages its lifecycle. This method
+        sets up a multiprocessing Process to execute the screen parsing function.
+
+        Attributes:
+            azimuth: The azimuth value passed to the screen parsing function.
+            natomil: The natomil value passed to the screen parsing function.
+            _running: A flag that indicates whether the instance is in a running state.
+        """
         parser_process = Process(target=screenparser.parse_my_screen, args=(self.azimuth, self.natomil))
         parser_process.start()
 

@@ -31,23 +31,21 @@ if __name__ == "__main__":
     app = QGuiApplication(sys.argv)
     engine = QQmlApplicationEngine()
 
-    # Threads and Objects
-    ThreadEasyOCR = QThread()
-    ThreadFastAPi = QThread()
-
+    # Handles all FastApi and EasyOCR Logic
     EasyOCR = ObjectEasyOCR()
     FastApi = ObjectFastApi()
 
+    # Threads
+    ThreadEasyOCR = QThread()
+    ThreadFastAPi = QThread()
     EasyOCR.moveToThread(ThreadEasyOCR)
     FastApi.moveToThread(ThreadFastAPi)
-
     ThreadEasyOCR.started.connect(EasyOCR.run_easyocr)
     ThreadFastAPi.started.connect(FastApi.run_fast_api_server)
-
     ThreadEasyOCR.start()
     ThreadFastAPi.start()
 
-    # Map Initialization
+    # Map Initialization and logic
     map = Map()
     engine.rootContext().setContextProperty("map_name_list_py", map.get_map_names())
     engine.rootContext().setContextProperty("map_class_py", map)
