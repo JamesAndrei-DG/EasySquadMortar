@@ -15,6 +15,8 @@ test*
 tests/*
 qt/components/maps/*
 dist/
+build/
+
 # Folder Exempt
 !qt/components/maps/javascript/
 
