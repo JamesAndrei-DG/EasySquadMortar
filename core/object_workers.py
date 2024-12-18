@@ -14,6 +14,7 @@ class ObjectEasyOCR(QObject):
         # Initialize Varibles
         self.natomil = Value(ctypes.c_uint16)
         self.azimuth = Value(ctypes.c_float)
+        self._pause = Value(ctypes.c_bool) #To be implemented
         self._running = True
 
     def run_easyocr(self) -> None:
@@ -26,6 +27,8 @@ class ObjectEasyOCR(QObject):
             natomil: The natomil value passed to the screen parsing function.
             _running: A flag that indicates whether the instance is in a running state.
         """
+        # Parse the screen on another process
+        # Make sure "freeze_support()" is used
         parser_process = Process(target=screenparser.parse_my_screen, args=(self.azimuth, self.natomil))
         parser_process.start()
 

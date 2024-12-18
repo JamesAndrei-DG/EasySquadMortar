@@ -44,7 +44,14 @@ class Map(QObject):
         Executes the action in a new thread.
         """
         print(f"Origin is: {keypad}")
-        threading.Thread(target=self.map_function.set_origin_keypad, args=(keypad,)).start()
+        thread = threading.Thread(target=self.map_function.set_origin_keypad, args=(keypad,))
+        thread.start()
+
+    def run_computation(self):
+        pass
+
+    def send_to_screen(self):
+        pass
 
     @Slot(str)
     def target_position(self, keypad: str):

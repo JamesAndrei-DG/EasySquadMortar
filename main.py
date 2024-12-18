@@ -22,7 +22,6 @@ def thread_close() -> None:
     ThreadFastAPi.terminate()
     ThreadEasyOCR.wait()
     ThreadFastAPi.wait(2000) #Cant close Uvicorn gracefully
-    print("Threads have been stopped.")
 
 
 if __name__ == "__main__":
@@ -48,6 +47,10 @@ if __name__ == "__main__":
 
     # Map Initialization and logic
     map = Map()
+    test = QThread()
+    map.moveToThread(test)
+    test.start()
+
     engine.rootContext().setContextProperty("map_name_list_py", map.get_map_names())
     engine.rootContext().setContextProperty("map_class_py", map)
 
