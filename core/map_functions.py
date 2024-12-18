@@ -1,5 +1,7 @@
 import math
 from time import perf_counter
+import os
+import sys
 import numpy as np
 from scipy.interpolate import LinearNDInterpolator
 
@@ -7,9 +9,6 @@ from scipy.interpolate import LinearNDInterpolator
 def _natomils2rad(natomils: int) -> float:
     """
     Converts a given value in mils (NATO mils) to radians.
-
-    The conversion factor is based on the formula:
-    radians = mils * 0.981719 * 0.001
 
     Args:
         natomils (int): The value in NATO mils to be converted.
@@ -23,9 +22,6 @@ def _natomils2rad(natomils: int) -> float:
 def _azimuth2rad(azimuth_f: float) -> float:
     """
     Converts an azimuth angle in degrees to radians.
-
-    The conversion is performed using the formula:
-    radians = degrees * π / 180
 
     Args:
         azimuth_f (float): The azimuth angle in degrees.
@@ -46,9 +42,17 @@ def _validate_inputs(azimuth_f: float, natomils: int) -> None:
 
 class MapFunction:
     def __init__(self):
-        with np.load("core/arrays/map_arrays_compressed.npz") as map_data:
-            self.map_data = map_data
-            self.current_map = self.map_data["array_0"]  # Default to Al Basrah
+
+        if getattr(sys, 'frozen', False):
+            with np.load(
+                    os.path.join(os.path.dirname(sys.executable), "core", "arrays", "map_arrays_compressed.npz")) as map_data:
+                self.map_data = map_data
+                self.current_map = self.map_data["array_0"]  # Default to Al Basrah
+
+        else:
+            with np.load("core/arrays/map_arrays_compressed.npz") as map_data:
+                self.map_data = map_data
+                self.current_map = self.map_data["array_0"]  # Default to Al Basrah
         self.precalculated_firing_solution = []
         self.origin_x = 0
         self.origin_y = 0
@@ -274,7 +278,7 @@ class MapFunction:
         y_scale = np.cos(rad)
         height_array = []
 
-        for meters in range(0, 1500+1, 10):
+        for meters in range(0, 1500 + 1, 10):
             x_find = int(self.origin_x + meters * x_scale)
             y_find = int(self.origin_y - meters * y_scale)  # Needs to be inverted
             height_array.append((self.get_height(x_find, y_find), x_find, y_find))

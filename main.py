@@ -6,7 +6,7 @@ from PySide6.QtQml import QQmlApplicationEngine
 from PySide6.QtWebEngineQuick import QtWebEngineQuick
 from core.object_workers import ObjectFastApi, ObjectEasyOCR
 from core.map_Qobject import Map
-
+from multiprocessing import freeze_support
 
 def thread_close() -> None:
     """
@@ -26,6 +26,7 @@ def thread_close() -> None:
 
 
 if __name__ == "__main__":
+    freeze_support()
     # Initialization
     QtWebEngineQuick.initialize()
     app = QGuiApplication(sys.argv)

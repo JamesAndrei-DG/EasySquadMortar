@@ -1,4 +1,6 @@
 import re
+import os
+import sys
 
 # Constants for Regular Expression Patterns
 NAME_PATTERN = r'name:\s*"([^"]*)"'
@@ -20,8 +22,13 @@ def parse_maps() -> list:
             - Map URL (str): The URL of the map image.
             - Max Zoom Level (str): The maximum zoom level of the map.
     """
-    with open('./assets/maps.js', 'r') as file:
-        javascript_file = file.read()
+
+    if getattr(sys, 'frozen', False):
+        with open(os.path.join(os.path.dirname(sys.executable), 'assets', 'maps.js'), 'r') as file: #fix error
+            javascript_file = file.read()
+    else:
+        with open('./assets/maps.js', 'r') as file:
+            javascript_file = file.read()
 
     names = re.findall(NAME_PATTERN, javascript_file)
     sizes = re.findall(SIZE_PATTERN, javascript_file)
