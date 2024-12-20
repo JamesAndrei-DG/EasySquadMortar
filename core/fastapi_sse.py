@@ -18,11 +18,12 @@ app.add_middleware(
 
 # Pause Event Handler
 pause_for_waypoint_generator = Event()
-pause_for_waypoint_generator.clear()
+pause_for_waypoint_generator.set()
 long = 0
 lat = 0
 frequency = 4
 seconds_per_frequency = 1 / frequency
+running = True
 
 
 def set_waypoint(x: int, y: int) -> None:
@@ -50,7 +51,7 @@ def generate_event() -> str:
 
 
 async def waypoints_generator() -> list:
-    while True:
+    while running:
         await pause_for_waypoint_generator.wait()
         yield generate_event()
         print(f"x: {long} y: {lat}")

@@ -1,4 +1,5 @@
 import QtQuick
+import QtQuick.Window
 import QtQuick.Layouts
 import QtQuick.Controls
 
@@ -13,6 +14,10 @@ MenuItem {
         x: (parent.width - width) / 2
         y: (parent.height - height) / 2
         standardButtons: Dialog.Ok | Dialog.Cancel
+
+        signal inputMortarPosition_signal(string keypad)
+
+        objectName: "inputMortarPosition_objname"
 
 
         contentItem: ColumnLayout {
@@ -38,8 +43,6 @@ MenuItem {
                 inputMask: ">A99-9-9-9-9; "
                 ToolTip.visible: hovered
                 ToolTip.text: "E01-9-5-3-3"
-
-
             }
 
 
@@ -49,7 +52,7 @@ MenuItem {
         onAccepted: {
 
 
-            map_class_py.mortar_position(mortarPosition.text.replace(/--+/g, ''));
+            inputMortarPosition_signal(mortarPosition.text.replace(/--+/g, ''));
         }
 
 

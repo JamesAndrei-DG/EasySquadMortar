@@ -45,7 +45,8 @@ class MapFunction:
 
         if getattr(sys, 'frozen', False):
             with np.load(
-                    os.path.join(os.path.dirname(sys.executable), "core", "arrays", "map_arrays_compressed.npz")) as map_data:
+                    os.path.join(os.path.dirname(sys.executable), "core", "arrays",
+                                 "map_arrays_compressed.npz")) as map_data:
                 self.map_data = map_data
                 self.current_map = self.map_data["array_0"]  # Default to Al Basrah
 

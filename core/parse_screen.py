@@ -1,39 +1,11 @@
 from __future__ import annotations
-
 import ctypes
 import time
-from multiprocessing import Process
 from multiprocessing.sharedctypes import Synchronized
-
 import cv2
 import easyocr
 import mss
 import numpy as np
-
-
-def parse_on_another_process(azimuth: Synchronized[ctypes.c_float], natomil: Synchronized[ctypes.c_uint16]) -> None:
-    """
-    Parses data on a separate process using the provided synchronized shared memory values for communication.
-    
-    WARNING: On Windows, you *must* call `multiprocessing.freeze_support()` before calling this function.
-    Failure to do so will result in the process not running properly when used with "frozen" executables
-    (i.e., binaries produced by packages like PyInstaller and cx_Freeze).
-    
-    This function utilizes the multiprocessing library to create and start a new process that runs the
-    internal `_parse_my_screen` function. It uses the given synchronized shared memory objects as arguments
-    to facilitate inter-process communication. This approach allows for asynchronous execution while
-    ensuring thread-safe modification of shared state.
-    
-    Arguments:
-        azimuth: A synchronized shared memory object containing a `ctypes.c_float` value. It is used
-                 to provide the azimuth data that will be processed by the target function.
-        natomil: A synchronized shared memory object containing a `ctypes.c_uint16` value. It acts
-                 as a communication object for handling natomil-related data during the execution
-                 of the process.
-    """
-    proc = Process(target=parse_my_screen, args=(azimuth, natomil))
-    print("Starting Process")
-    proc.start()
 
 
 def parse_my_screen(azimuth: Synchronized[ctypes.c_float], natomil: Synchronized[ctypes.c_uint16]):
