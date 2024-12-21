@@ -27,7 +27,7 @@ class MapClass(QObject):
         self.azimuth = Value(ctypes.c_float, 0.0)
         self._running = True
         self._pause = Event()
-        self._pause.clear()
+        self._pause.set()
         self.thread_mortar = None
         self.thread_computation = None
         self.process_parser = None
@@ -61,13 +61,13 @@ class MapClass(QObject):
         Executes the action in a new thread.
         """
         print(f"Origin is: {keypad}")
-        if self.thread_mortar.is_alive():
+        if self.thread_mortar and self.thread_mortar.is_alive():
             self.thread_mortar.join()
 
         self.thread_mortar = Thread(target=self.map_manager.set_origin_keypad, args=(keypad,))
         self.thread_mortar.start()
 
-        if not self.thread_computation.is_alive():
+        if not self.thread_computation or not self.thread_computation.is_alive():
             self._run_computation_thread()
 
     def _run_computation_thread(self) -> None:
@@ -103,10 +103,12 @@ class MapClass(QObject):
         ensures the EasyOCR parsing begins as a subprocess to allow for asynchronous
         execution.
         """
+        print("Creating EasyOCR Process")
         self.process_parser = Process(target=screenparser.parse_my_screen, args=(self.azimuth, self.natomil))
         self.process_parser.start()
+        print("Started EasyOCR Process")
 
-    def terminate_easyocr(self) -> None:
+    def stop_threads_and_tasks(self) -> None:
         if self.process_parser and self.process_parser.is_alive():
             self.process_parser.terminate()
             self.process_parser.join()
@@ -116,14 +118,15 @@ class MapClass(QObject):
             raise RuntimeError(
                 "Cannot terminate: No process is currently running or the process has already been terminated.")
 
-    def terminate_threads(self) -> None:
-        if self.thread_mortar.is_alive():
+        if self.thread_mortar and self.thread_mortar.is_alive():
             self.thread_mortar.join()
-            print("thread_mortar successfully closed")
-        if self.thread_computation.is_alive():
+            print("thread_mortar terminated")
+        if self.thread_computation and self.thread_computation.is_alive():
             self._quit_computation_thread()
             self.thread_computation.join()
-            print("thread_computation successfully closed")
+            print("thread_computation terminated")
+
+
 
     def fastapi_send_coordinates(self, coordinates: tuple[int, int]) -> None:
         self.fastapi_reference.change_xy(coordinates)

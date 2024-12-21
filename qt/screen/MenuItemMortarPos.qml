@@ -15,10 +15,6 @@ MenuItem {
         y: (parent.height - height) / 2
         standardButtons: Dialog.Ok | Dialog.Cancel
 
-        signal inputMortarPosition_signal(string keypad)
-
-        objectName: "inputMortarPosition_objname"
-
 
         contentItem: ColumnLayout {
             spacing: 10
@@ -52,7 +48,7 @@ MenuItem {
         onAccepted: {
 
 
-            inputMortarPosition_signal(mortarPosition.text.replace(/--+/g, ''));
+            map_class_py.mortar_position(mortarPosition.text.replace(/--+/g, ''));
         }
 
 

@@ -15,8 +15,6 @@ ApplicationWindow {
     width: 500 //1050
     visible: true
 
-    signal rootSignal()
-
 
     StackView {
         id: stackView

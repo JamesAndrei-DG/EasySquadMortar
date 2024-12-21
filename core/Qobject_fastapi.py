@@ -1,6 +1,4 @@
 from PySide6.QtCore import QObject
-
-import core.fastapi_sse
 import core.fastapi_sse as fastapi
 import uvicorn
 
@@ -20,7 +18,7 @@ class ObjectFastApi(QObject):
         self.server.run()
 
     def change_xy(self, coordinates: tuple[int, int]) -> None:
-        fastapi.long, fastapi.lat = coordinates
+        fastapi.long, fastapi.lat = coordinates[0], -coordinates[1]
 
     def pause_sending_coordinates(self) -> None:
         fastapi.pause()

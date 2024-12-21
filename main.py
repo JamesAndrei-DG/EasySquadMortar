@@ -18,12 +18,16 @@ def thread_close() -> None:
     """
     print("Application is closing. Cleaning up...")
     # Stop EasyOcr while loop
-    map_container.terminate_easyocr()
+    map_container.stop_threads_and_tasks()
     fast_api_container.terminate_server()
     map_thread.quit()
     fast_api_thread.quit()
+    print("Waiting for map_thread to close")
     map_thread.wait()
-    fast_api_thread.wait()  # Cant close Uvicorn gracefully
+    print("map_thread to closed successfully")
+    print("Waiting for fast_api_thread to close")
+    fast_api_thread.wait(5000)  # Cant close Uvicorn gracefully
+    print("fast_api_thread to closed successfully")
 
 
 if __name__ == "__main__":
@@ -38,7 +42,7 @@ if __name__ == "__main__":
     fast_api_thread = QThread()
     fast_api_container.moveToThread(fast_api_thread)
     fast_api_thread.started.connect(fast_api_container.run_fastapi_server)
-    # fast_api_thread.start()
+    fast_api_thread.start()
 
     # Map thread and logic
     map_container = MapClass(fast_api_container)
@@ -48,26 +52,13 @@ if __name__ == "__main__":
     map_thread.start()
 
     engine.rootContext().setContextProperty("map_name_list_py", map_container.get_map_names())
-    # engine.rootContext().setContextProperty("map_class_py", map_container)
+    engine.rootContext().setContextProperty("map_class_py", map_container)
 
     # Load QML File
     engine.load((QUrl("qt/root.qml")))
 
     if not engine.rootObjects():
         sys.exit(-1)
-
-    # connect
-    # engine.rootObjects()[0].setMortarPos_Signal.connect(map_container.mortar_position, type=Qt.ConnectionType.QueuedConnection)
-
-    engine.rootObjects()[0].rootSignal.connect(map_container.rootest, type=Qt.ConnectionType.QueuedConnection)
-    import time
-    time.sleep(5)
-    qmlmortarpos = engine.rootObjects()[0].findChild(QObject, "inputMortarPosition_objname")
-
-# !!! and connect MyPage2.page2_signal() to test_object.test_slot3
-    qmlmortarpos.inputMortarPosition_signal.connect(
-        map_container.mortar_position,
-        type=Qt.ConnectionType.QueuedConnection)
 
     # Close Thread on Exit
     app.aboutToQuit.connect(thread_close)

@@ -60,9 +60,9 @@ async def waypoints_generator() -> list:
     while running:
         await pause_for_waypoint_generator.wait()
         await sleep(seconds_per_frequency)
-        if lat_temp == lat and long_temp == lat:
-            continue
 
+        if lat == lat_temp and long == long_temp:
+            continue
         yield generate_event()
         print(f"x: {long} y: {lat}")
 

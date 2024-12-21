@@ -24,8 +24,8 @@ def parse_my_screen(azimuth: Synchronized[ctypes.c_float], natomil: Synchronized
         integer variable that will be updated with the natomil value fetched
         from the parser.
     """
+    print("Creating EasyOCR Instance")
     parser = ParseScreen()
-    print("Running Process")
     while True:
         azimuth.value = parser.get_azimuth()
         natomil.value = parser.get_natomil()
@@ -45,7 +45,7 @@ class ParseScreen:
         self.box_position = [0, 0]
         self.box_difference = None
         self.pixel_per_natomil = 5
-        print(f"Initializing Screen OCR with EasyOCR model")
+        print(f"Initializing EasyOCR")
 
     def get_azimuth(self) -> float:
         """
