@@ -60,3 +60,5 @@ https://groups.google.com/g/pyinstaller/c/z9bpOSeu0H0?pli=1
 
 #signal and slot (NON BLOCKING)
 https://stackoverflow.com/a/69595659
+
+#signal and slot use direct connection in pyside by default use threads

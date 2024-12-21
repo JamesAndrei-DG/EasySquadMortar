@@ -11,10 +11,6 @@ Menu {
 
     }
 
-    TestItemTargetPos{
-
-    }
-
 
     MenuItem {
         text: "Exit"

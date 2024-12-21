@@ -44,7 +44,7 @@ if __name__ == "__main__":
     map_container = MapClass(fast_api_container)
     map_thread = QThread()
     map_container.moveToThread(map_thread)
-    map_thread.started.connect(map_container.run_easyocr)
+    map_thread.started.connect(map_container._run_easyocr)
     map_thread.start()
 
     engine.rootContext().setContextProperty("map_name_list_py", map_container.get_map_names())
@@ -59,8 +59,9 @@ if __name__ == "__main__":
     # connect
     # engine.rootObjects()[0].setMortarPos_Signal.connect(map_container.mortar_position, type=Qt.ConnectionType.QueuedConnection)
 
-    engine.rootObjects()[0].rootSignal.connect(map_container.root, type=Qt.ConnectionType.QueuedConnection)
-
+    engine.rootObjects()[0].rootSignal.connect(map_container.rootest, type=Qt.ConnectionType.QueuedConnection)
+    import time
+    time.sleep(5)
     qmlmortarpos = engine.rootObjects()[0].findChild(QObject, "inputMortarPosition_objname")
 
 # !!! and connect MyPage2.page2_signal() to test_object.test_slot3

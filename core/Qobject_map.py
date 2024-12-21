@@ -1,15 +1,15 @@
 import ctypes
 import re
-from multiprocessing import Value, Process
-from threading import Thread
-from time import perf_counter
-from typing import Any
+import time
+from multiprocessing import Process, Value
+from threading import Event, Thread
 
-from PySide6.QtCore import QObject, Slot, Signal
+from PySide6.QtCore import QObject, Signal, Slot
+
 import core.parse_screen as screenparser
+from core.Qobject_fastapi import ObjectFastApi
 from core.map_functions import MapFunction
 from core.parse_maps import parse_maps
-from core.Qobject_fastapi import ObjectFastApi
 
 
 class MapClass(QObject):
@@ -25,11 +25,13 @@ class MapClass(QObject):
         self.target_keypad = ''
         self.natomil = Value(ctypes.c_uint16, 0)
         self.azimuth = Value(ctypes.c_float, 0.0)
-        self._pause = Value(ctypes.c_bool)  # To be implemented
         self._running = True
-        self.thread = None
-        self.parser_process = None
-        self.fastapi_reference = fastapi
+        self._pause = Event()
+        self._pause.clear()
+        self.thread_mortar = None
+        self.thread_computation = None
+        self.process_parser = None
+        self.fastapi_reference = fastapi  # we dont check if fastapi is valid
 
     def get_map_names(self):
         """
@@ -41,7 +43,7 @@ class MapClass(QObject):
 
         return self.map_names
 
-    @Slot(int)  # Fixed the type annotation for map_index
+    @Slot(int)
     def selected_map(self, map_index: int):
         """
         Handles user selection of a map.
@@ -59,51 +61,41 @@ class MapClass(QObject):
         Executes the action in a new thread.
         """
         print(f"Origin is: {keypad}")
-        self.thread = Thread(target=self.map_manager.set_origin_keypad, args=(keypad,))
-        self.thread.start()
+        if self.thread_mortar.is_alive():
+            self.thread_mortar.join()
 
-        # self.run_computation()
+        self.thread_mortar = Thread(target=self.map_manager.set_origin_keypad, args=(keypad,))
+        self.thread_mortar.start()
 
-    def run_computation(self) -> None:
-        x = 0
-        y = 0
-        while True:
-            import time
-            self.fastapi_send_coordinates(x, y)
-            x += 1
-            y += 1
-            time.sleep(1)
+        if not self.thread_computation.is_alive():
+            self._run_computation_thread()
 
-    def _get_azimuth_natomils(self) -> None:
-        pass
+    def _run_computation_thread(self) -> None:
+        self.thread_computation = Thread(target=self._compute_location)
+        self.thread_computation.start()
 
-    def fastapi_send_coordinates(self, x: int, y: int) -> None:
-        self.fastapi_reference.change_xy(x, y)
+    def _compute_location(self) -> None:
+        while self._running:
+            self._pause.wait()
+            natomil = int(self.natomil.value)
+            azimuth = float(self.azimuth.value)
+            if natomil == 0 or azimuth == -1:
+                time.sleep(0.5)
+                continue
 
-    def fastapi_pause(self):
-        self.fastapi_reference.pause_sending_coordinates()
+            coordinates = self.map_manager.shoot_distance(azimuth, natomil)
+            self.fastapi_send_coordinates(coordinates)
 
-    def fastapi_resume(self):
-        self.fastapi_reference.resume_sending_coordinates()
+    def _resume_computation(self) -> None:
+        self._pause.set()
 
-    @Slot(str)
-    def target_position(self, keypad: str):
-        t1 = perf_counter()
-        value = self.map_manager.shoot_distance(82, 1473)
-        t2 = perf_counter()
-        time = (t2 - t1) * 1000
-        print(f"Calculation Finished in {time} ms for precalculated")
-        print(f"value is\n {value} meters")
+    def _pause_computation(self) -> None:
+        self._pause.clear()
 
-        t1 = perf_counter()
-        self.map_manager.precalculated = False
-        value = self.map_manager.shoot_distance(82, 1473)
-        t2 = perf_counter()
-        time = (t2 - t1) * 1000
-        print(f"Calculation Finished in {time} ms for approximation")
-        print(f"value is\n {value} meters")
+    def _quit_computation_thread(self) -> None:
+        self._running = False
 
-    def run_easyocr(self) -> None:
+    def _run_easyocr(self) -> None:
         """
         Runs the EasyOCR process by initiating and starting a separate process.
         
@@ -111,15 +103,33 @@ class MapClass(QObject):
         ensures the EasyOCR parsing begins as a subprocess to allow for asynchronous
         execution.
         """
-        self.parser_process = Process(target=screenparser.parse_my_screen, args=(self.azimuth, self.natomil))
-        self.parser_process.start()
+        self.process_parser = Process(target=screenparser.parse_my_screen, args=(self.azimuth, self.natomil))
+        self.process_parser.start()
 
     def terminate_easyocr(self) -> None:
-        if self.parser_process and self.parser_process.is_alive():
-            self.parser_process.terminate()
-            self.parser_process.join()
-            self.parser_process.close()
+        if self.process_parser and self.process_parser.is_alive():
+            self.process_parser.terminate()
+            self.process_parser.join()
+            self.process_parser.close()
             print("EasyOCR process terminated.")
         else:
             raise RuntimeError(
                 "Cannot terminate: No process is currently running or the process has already been terminated.")
+
+    def terminate_threads(self) -> None:
+        if self.thread_mortar.is_alive():
+            self.thread_mortar.join()
+            print("thread_mortar successfully closed")
+        if self.thread_computation.is_alive():
+            self._quit_computation_thread()
+            self.thread_computation.join()
+            print("thread_computation successfully closed")
+
+    def fastapi_send_coordinates(self, coordinates: tuple[int, int]) -> None:
+        self.fastapi_reference.change_xy(coordinates)
+
+    def fastapi_pause(self):
+        self.fastapi_reference.pause_sending_coordinates()
+
+    def fastapi_resume(self):
+        self.fastapi_reference.resume_sending_coordinates()

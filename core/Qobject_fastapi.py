@@ -19,9 +19,8 @@ class ObjectFastApi(QObject):
         self.server = uvicorn.Server(config=config)
         self.server.run()
 
-    def change_xy(self, x: int, y: int) -> None:
-        fastapi.long = x
-        fastapi.lat = y
+    def change_xy(self, coordinates: tuple[int, int]) -> None:
+        fastapi.long, fastapi.lat = coordinates
 
     def pause_sending_coordinates(self) -> None:
         fastapi.pause()

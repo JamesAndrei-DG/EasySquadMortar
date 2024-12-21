@@ -45,30 +45,27 @@ class ParseScreen:
         self.box_position = [0, 0]
         self.box_difference = None
         self.pixel_per_natomil = 5
-        self.buffer_natomil = 0
-        self.buffer_azimuth = 0.0
         print(f"Initializing Screen OCR with EasyOCR model")
 
     def get_azimuth(self) -> float:
         """
         Retrieves the azimuth value using easyocr from game output. 
-        It updates the buffer for azimuth and returns the retrieved azimuth value as a float.
+        It returns the retrieved azimuth value as a float.
         
         Returns:
             float: The azimuth angle acquired from the OCR results.
         """
         azimuth = self._get_azimuth_ocr_results()
         try:
-            self.buffer_azimuth = float(azimuth[0])
             return float(azimuth[0])
         except IndexError:
             print("Make sure squad game is in focus")
             time.sleep(2)
-            return self.buffer_azimuth
+            return -1
         except TypeError:
             print("Make sure squad game is in focus")
             time.sleep(2)
-            return self.buffer_azimuth
+            return -1
         except Exception as error:
             raise Exception(f"Error Encountered in get_azimuth:\n{error}")
 
@@ -78,9 +75,7 @@ class ParseScreen:
 
         This function calculates the 'Natomil' value by calling the
         `approximate_natomil` method. It validates the result to ensure
-        it falls within the expected range. If validation is successful,
-        the value is returned and stored for future use. If the validation
-        fails, a previously stored buffer value is returned. 
+        it falls within the expected range.
 
         Returns:
             int: The natomil value acquired from the OCR results.
@@ -89,14 +84,13 @@ class ParseScreen:
         value = self._approximate_natomil()
         try:
             if 800 <= int(value) <= 1580:
-                self.buffer_natomil = int(value)
                 return int(value)
             else:
-                return self.buffer_natomil
+                return 0
         except IndexError:
-            return self.buffer_natomil
+            return 0
         except TypeError:
-            return self.buffer_natomil
+            return 0
         except Exception as error:
             raise Exception(f"Error Encountered in get_natomil:\n{error}")
 
