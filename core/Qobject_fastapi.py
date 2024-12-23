@@ -32,5 +32,5 @@ class ObjectFastApi(QObject):
             self.server.should_exit = True
             print("Server is shutting down")
         else:
-            raise Exception(
+            print(
                 "Cannot terminate: No server is currently running or the server has already been terminated.")

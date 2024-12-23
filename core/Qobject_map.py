@@ -115,7 +115,7 @@ class MapClass(QObject):
             self.process_parser.close()
             print("EasyOCR process terminated.")
         else:
-            raise RuntimeError(
+            print(
                 "Cannot terminate: No process is currently running or the process has already been terminated.")
 
         if self.thread_mortar and self.thread_mortar.is_alive():
@@ -125,8 +125,6 @@ class MapClass(QObject):
             self._quit_computation_thread()
             self.thread_computation.join()
             print("thread_computation terminated")
-
-
 
     def fastapi_send_coordinates(self, coordinates: tuple[int, int]) -> None:
         self.fastapi_reference.change_xy(coordinates)
