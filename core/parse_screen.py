@@ -3,7 +3,6 @@ import ctypes
 import time
 from multiprocessing.sharedctypes import Synchronized
 import cv2
-import easyocr
 import mss
 import numpy as np
 
@@ -34,6 +33,7 @@ def parse_my_screen(azimuth: Synchronized[ctypes.c_float], natomil: Synchronized
 class ParseScreen:
 
     def __init__(self):
+        import easyocr
         self.SCREEN_RESOLUTION = (1920, 1080)
         self.AZIMUTH_SCREEN_COORDS = {"top": 1050, "left": 940, "width": 41, "height": 16}
         self.NATOMIL_SCREEN_COORDS = {"top": int(self.SCREEN_RESOLUTION[1] / 2 - 100 / 2),

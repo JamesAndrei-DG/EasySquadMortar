@@ -11,7 +11,7 @@ ApplicationWindow {
 
     color: "transparent"
     flags:  Qt.FramelessWindowHint | Qt.WindowStaysOnTopHint
-    height: 200 //650
+    height: 120 //650
     width: 500 //1050
     visible: true
 
@@ -29,7 +29,10 @@ ApplicationWindow {
                 duration: 2000
                 easing.type: Easing.InQuart
             }
+
         }
+
+
         replaceExit: Transition {
             PropertyAnimation {
                 property: "opacity"
@@ -38,19 +41,22 @@ ApplicationWindow {
                 duration: 500
                 easing.type: Easing.InQuad
             }
+
         }
 
     }
+
 
     PropertyAnimation {
         id: opacityAnimation
         target: mapWindow
         property: "opacity"
         from: 0
-        to: 1
+        to: 0.75
         duration: 2000  // Duration of the fade-out effect
         easing.type: Easing.InQuart  // Ease-in quad effect
     }
+
 
     Timer {
         id: splashTimer
@@ -62,9 +68,8 @@ ApplicationWindow {
             stackView.replace("screen/main.qml")
 
             secondDelayTimer.start()
-
-
         }
+
     }
     Timer {
         id: secondDelayTimer
@@ -77,8 +82,8 @@ ApplicationWindow {
             mainWindow.y = 0
 
             opacityAnimation.start()
-
         }
+
     }
 
     QtObject {
@@ -87,7 +92,8 @@ ApplicationWindow {
             // Position mapWindow relative to mainWindow
             x: mainWindow.x - (mapWindow.width - mainWindow.width)  // Offset if you want mapWindow to be positioned relative to mainWindow
             y: mainWindow.y   // Offset if you want mapWindow to be positioned relative to mainWindow
-
         }
+
     }
+
 }

@@ -23,6 +23,7 @@ ComboBox {
         mapSelector.popup.contentItem.implicitHeight = Qt.binding(function () {
             return Math.min(250, mapSelector.popup.contentItem.contentHeight);
         });
+
     }
 
 

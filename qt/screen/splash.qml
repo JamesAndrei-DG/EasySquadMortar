@@ -15,5 +15,4 @@ Rectangle {
         color: "black"
     }
 
-
 }

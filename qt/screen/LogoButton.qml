@@ -34,6 +34,7 @@ Rectangle {
             } else if (mouse.button === Qt.LeftButton) {
                 dragStartPosition = Qt.point(mouse.x, mouse.y)
             }
+
         }
 
 
@@ -44,6 +45,7 @@ Rectangle {
                 mainWindow.x += dx
                 mainWindow.y += dy
             }
+
         }
 
 
@@ -53,4 +55,5 @@ Rectangle {
 
 
     }
+
 }
