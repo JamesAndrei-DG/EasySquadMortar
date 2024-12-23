@@ -27,4 +27,11 @@ ComboBox {
     }
 
 
+    background: Rectangle {
+        color: "white"
+        border.color: "black"
+        border.width: 1
+        radius: 10  // Rounded corners for ComboBox itself
+    }
+
 }

@@ -11,7 +11,7 @@ ApplicationWindow {
 
     color: "transparent"
     flags:  Qt.FramelessWindowHint | Qt.WindowStaysOnTopHint
-    height: 120 //650
+    height: 128 //650
     width: 500 //1050
     visible: true
 
