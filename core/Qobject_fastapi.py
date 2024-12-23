@@ -18,7 +18,8 @@ class ObjectFastApi(QObject):
         self.server.run()
 
     def change_xy(self, coordinates: tuple[int, int]) -> None:
-        fastapi.long, fastapi.lat = coordinates[0], -coordinates[1]
+        coord = (coordinates[0], -coordinates[1])
+        fastapi.set_waypoint(coord)
 
     def pause_sending_coordinates(self) -> None:
         fastapi.pause()

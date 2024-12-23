@@ -8,7 +8,7 @@ Menu {
 
 
     MenuItemMortarPos{
-
+        id: menuItemMortar
     }
 
 

@@ -56,4 +56,19 @@ Rectangle {
 
     }
 
+    ConfirmationLogic{
+        id: confirmLogic
+    }
+
+    Timer{
+        id: confirmTimer
+        interval: 250
+        running: false
+        repeat: false
+
+        onTriggered: {
+            confirmLogic.open()
+        }
+    }
+
 }

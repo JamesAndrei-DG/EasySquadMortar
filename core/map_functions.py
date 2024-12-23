@@ -4,6 +4,7 @@ import os
 import sys
 import numpy as np
 from scipy.interpolate import LinearNDInterpolator
+from threading import Lock
 
 
 def _natomils2rad(natomils: int) -> float:
@@ -58,6 +59,7 @@ class MapFunction:
         self.origin_x = 0
         self.origin_y = 0
         self.precalculated = False
+        self._thread_lock = Lock()
 
     def change_map(self, map_index: int) -> None:
         """
@@ -78,8 +80,9 @@ class MapFunction:
             y (int): Y-coordinate for the origin.
         """
         print(f"Setting origin to ({x}, {y})")
-        self.origin_x = x
-        self.origin_y = y
+        with self._thread_lock:
+            self.origin_x = x
+            self.origin_y = y
         self._precalculate_firing_solution()
 
     def set_origin_keypad(self, keypad: str) -> None:
@@ -90,11 +93,16 @@ class MapFunction:
             keypad (str): Keypad string specifying the origin (e.g., "A1-5-2-8-5").
         """
         print(f"Setting origin using keypad: {keypad}")
-        self.origin_x, self.origin_y = self.get_keypad_position(keypad)
-        print(f"Calculated origin: x={self.origin_x}, y={self.origin_y}")
+        with self._thread_lock:
+            self.origin_x, self.origin_y = self._get_keypad_position(keypad)
+            print(f"Calculated origin: x={self.origin_x}, y={self.origin_y}")
         self._precalculate_firing_solution()
 
-    def get_keypad_position(self, keypad: str) -> tuple[int, int]:
+    def get_origin(self) -> tuple[int, int]:
+        with self._thread_lock:
+            return self.origin_x, self.origin_y
+
+    def _get_keypad_position(self, keypad: str) -> tuple[int, int]:
         """
         Calculates the position (x, y) based on a keypad input.
     

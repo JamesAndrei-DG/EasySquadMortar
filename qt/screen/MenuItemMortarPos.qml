@@ -7,7 +7,11 @@ import QtQuick.Controls
 MenuItem {
     text: "Set Mortar Position"
     onTriggered: inputMortarPosition.open()
+    id: menuItemMortarPos
 
+    function openMortarPosDialog(){
+        inputMortarPosition.open()
+    }
 
     Dialog {
         id: inputMortarPosition
@@ -81,8 +85,15 @@ MenuItem {
 
         onAccepted: {
             map_class_py.mortar_position(mortarPosition.text.replace(/--+/g, ''));
+            confirmTimer.start();
+        }
+
+        onRejected: {
+            openMortarPosDialog();
         }
 
     }
+
+
 
 }

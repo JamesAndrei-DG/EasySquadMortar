@@ -30,6 +30,7 @@ class MapClass(QObject):
         self._pause.set()
         self.thread_mortar = None
         self.thread_computation = None
+        self.thread_origin = None
         self.process_parser = None
         self.fastapi_reference = fastapi  # we dont check if fastapi is valid
 
@@ -64,11 +65,35 @@ class MapClass(QObject):
         if self.thread_mortar and self.thread_mortar.is_alive():
             self.thread_mortar.join()
 
+        if self.thread_origin and self.thread_origin.is_alive():
+            self.thread_origin.join()
+
+        if self.thread_computation and self.thread_computation.is_alive():
+            self._pause_computation()
+            self.fastapi_pause()
+
         self.thread_mortar = Thread(target=self.map_manager.set_origin_keypad, args=(keypad,))
         self.thread_mortar.start()
 
+        self.thread_origin = Thread(target=self._send_mortar_position)
+        self.thread_origin.start()
+
+    @Slot()
+    def location_confirmed(self):
+        print(f"User confirmed keypad! Starting Calculations")
         if not self.thread_computation or not self.thread_computation.is_alive():
             self._run_computation_thread()
+            self.fastapi_resume()
+
+    def _send_mortar_position(self):
+        seconds = 2
+        mortar_pos = self.map_manager.get_origin()
+
+        self.fastapi_resume()
+        start = time.time()
+        while (time.time() - start) < seconds:
+            self.fastapi_send_coordinates(mortar_pos)
+        self.fastapi_pause()
 
     def _run_computation_thread(self) -> None:
         self.thread_computation = Thread(target=self._compute_location)
@@ -121,10 +146,20 @@ class MapClass(QObject):
         if self.thread_mortar and self.thread_mortar.is_alive():
             self.thread_mortar.join()
             print("thread_mortar terminated")
+        else:
+            print("thread_mortar already closed")
+        if self.thread_origin and self.thread_origin.is_alive():
+            self.thread_origin.join()
+            print("thread_origin terminated")
+        else:
+            print("thread_origin already closed")
         if self.thread_computation and self.thread_computation.is_alive():
             self._quit_computation_thread()
+            self._resume_computation()
             self.thread_computation.join()
             print("thread_computation terminated")
+        else:
+            print("thread_computation already closed")
 
     def fastapi_send_coordinates(self, coordinates: tuple[int, int]) -> None:
         self.fastapi_reference.change_xy(coordinates)
