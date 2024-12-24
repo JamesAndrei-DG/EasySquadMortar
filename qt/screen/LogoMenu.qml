@@ -1,21 +1,17 @@
 import QtQuick
-import QtQuick.Layouts
 import QtQuick.Controls
 
 
 Menu {
-    id: overlayMenu
+    id: logoMenu
 
-
-    MenuItemMortarPos{
-        id: menuItemMortar
+    MenuItem {
+        text: "Set Mortar Position"
+        onTriggered: dialogMortar.open()
     }
-
 
     MenuItem {
         text: "Exit"
         onTriggered: Qt.quit()
     }
-
-
 }

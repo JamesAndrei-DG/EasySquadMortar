@@ -3,7 +3,7 @@ import QtQuick.Controls
 
 
 Dialog {
-    id: confirmationDialog
+    id: dialogConfirm
     x: (parent.width - width) / 2;
     y: (parent.height - height) / 2;
 
@@ -20,9 +20,9 @@ Dialog {
 
     onAccepted: {
         map_class_py.location_confirmed();
-
     }
+
     onRejected: {
-        openMortarPosDialog()
+        dialogMortar.open()
     }
 }

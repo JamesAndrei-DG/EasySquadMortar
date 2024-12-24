@@ -10,12 +10,10 @@ ComboBox {
     anchors.right: parent.right
     currentIndex: 0
 
-
     onActivated: {
         map_class_py.selected_map(mapSelector.currentIndex);
         mapWindow.map_selected = mapSelector.currentText;
     }
-
 
     Component.onCompleted: {
         mapWindow.map_selected = mapSelector.currentText;
@@ -23,9 +21,7 @@ ComboBox {
         mapSelector.popup.contentItem.implicitHeight = Qt.binding(function () {
             return Math.min(250, mapSelector.popup.contentItem.contentHeight);
         });
-
     }
-
 
     background: Rectangle {
         color: "white"
@@ -33,5 +29,4 @@ ComboBox {
         border.width: 1
         radius: 10  // Rounded corners for ComboBox itself
     }
-
 }

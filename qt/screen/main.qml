@@ -9,15 +9,11 @@ Rectangle {
     height: parent.height
     color: "transparent"
 
+    LogoEntry {
+        id: logoEntry
+    }
 
     MapSelector {
         id: mapSelector
     }
-
-
-    LogoButton {
-        id: logoButton
-    }
-
-
 }
