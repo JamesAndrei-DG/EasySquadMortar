@@ -176,7 +176,8 @@ class ParseScreen:
 
                 if index == 1:
                     self.box_difference = self.box_position[1] - self.box_position[0]
-                    self.pixel_per_natomil = self.box_difference * 0.1
+                    if not self.box_difference == 0:
+                        self.pixel_per_natomil = self.box_difference * 0.1
 
                 if index == 0:
                     if number[2] >= 0.8:  # if it goes to 800 it no longer goes over 0.8 confidence
