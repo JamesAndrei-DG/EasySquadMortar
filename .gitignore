@@ -17,6 +17,7 @@ tests/*
 qt/components/maps/*
 dist/
 build/
+pyinstaller/
 
 # Folder Exempt
 !qt/components/maps/javascript/

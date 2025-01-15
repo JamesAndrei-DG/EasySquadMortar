@@ -9,7 +9,7 @@ Rectangle {
 
     Text {
         anchors.centerIn: parent
-        text: "Logo PlaceHolder"
+        text: "Easy Squad Mortar"
         font.pixelSize: 40
         color: "black"
     }

@@ -6,12 +6,11 @@ from core.parse_maps import parse_maps
 maps_array = parse_maps()
 
 for i, data in enumerate(maps_array):
-    base_map = folium.Map(crs='Simple', zoom_start=4)
+    base_map = folium.Map(crs='Simple', zoom_start=4, zoom_control=False)
     map_overlay = folium.raster_layers.ImageOverlay(
         image=str("./assets" + data[3] + "basemap.webp"),
         bounds=[[0, 0], [-int(data[1]), int(data[1])]],
         zigzag_index=1,
-        zoom_control=False,
     )
 
     map_overlay.add_to(base_map)

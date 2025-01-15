@@ -16,7 +16,7 @@ Rectangle {
     Text {
         anchors.centerIn: parent
         color: "white"
-        text: "Logo PlaceHolder"
+        text: "Easy Squad Mortar"
     }
 
     MouseFunction {
