@@ -12,6 +12,8 @@ def check_components():
     if os.path.exists("qt/components/maps/AlBasrah.html"):
         print("File Found")
     else:
+        print("Files not found")
+        print("Generating Files")
         import tool_generate_html
 
 
