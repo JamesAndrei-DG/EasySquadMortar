@@ -8,6 +8,24 @@ from core.Qobject_fastapi import ObjectFastApi
 from core.Qobject_map import MapClass
 from multiprocessing import freeze_support
 
+def check_components():
+    if os.path.exists("qt/components/maps/AlBasrah.html"):
+        print("File Found")
+    else:
+        import tool_generate_html
+
+
+def check_resolution(application:any) -> None:
+    # Check Resolution
+    import ctypes
+
+    width, height = application.primaryScreen().size().toTuple()
+
+    if (width, height) not in [(1920, 1080),]:
+        ctypes.windll.user32.MessageBoxW(0,
+                                         f"Your screen resolution of:\n{width}x{height} is not yet supported\nUse 1920x1080\n\nNote: If you are using the correct resolution\nMake sure your scaling is set to 100% only",
+                                         f"Resolution not supported!", 0)
+        raise Exception("Invalid Monitor Size")
 
 def thread_close() -> None:
     """
@@ -32,9 +50,13 @@ def thread_close() -> None:
 
 if __name__ == "__main__":
     freeze_support()
+    check_components()
+
     # Initialization
     QtWebEngineQuick.initialize()
     app = QGuiApplication(sys.argv)
+    check_resolution(app)
+
     engine = QQmlApplicationEngine()
 
     # Fast Api thread and logic

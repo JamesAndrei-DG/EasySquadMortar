@@ -1,5 +1,6 @@
 from __future__ import annotations
 import ctypes
+import sys
 import time
 from multiprocessing.sharedctypes import Synchronized
 import cv2
@@ -33,8 +34,10 @@ def parse_my_screen(azimuth: Synchronized[ctypes.c_float], natomil: Synchronized
 class ParseScreen:
 
     def __init__(self):
+
         import easyocr
-        self.SCREEN_RESOLUTION = (1920, 1080)
+        self.SCREEN_RESOLUTION = None
+        self.check_resolution()
         self.AZIMUTH_SCREEN_COORDS = {"top": 1050, "left": 940, "width": 41, "height": 16}
         self.NATOMIL_SCREEN_COORDS = {"top": int(self.SCREEN_RESOLUTION[1] / 2 - 100 / 2),
                                       "left": 530, "width": 60, "height": 110}
@@ -46,6 +49,18 @@ class ParseScreen:
         self.box_difference = None
         self.pixel_per_natomil = 5
         print(f"Initializing EasyOCR")
+
+    def check_resolution(self) -> None:
+        print("Checking Resolution")
+        try:
+            from PySide6.QtGui import QGuiApplication
+            app = QGuiApplication(sys.argv)
+            width, height = app.primaryScreen().size().toTuple()
+            self.SCREEN_RESOLUTION = (width, height)
+        except Exception as error:
+            raise Exception(f"Error Occured {error}")
+        finally:
+            del app
 
     def get_azimuth(self) -> float:
         """
