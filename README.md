@@ -10,7 +10,12 @@ Easy Squad Mortar uses computer vision to calculate the landing location in real
 - **Cross-platform**: Compatible with Windows, macOS, and Linux.
 - **Lightweight**: Minimal resource usage ensures smooth operation on most systems.
 
-### Prerequisites
+![intro](https://github.com/user-attachments/assets/ff5dc5b9-68b3-4ed4-8aa5-26c44fde24e1)
+
+![outro](https://github.com/user-attachments/assets/ce21eb65-2a0f-4ecd-af07-e9ce8a1ec6b3)
+
+
+## Prerequisites
 
 Ensure you have the following installed on your system:
 - **Python 3.11**
