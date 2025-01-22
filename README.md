@@ -7,7 +7,7 @@ Easy Squad Mortar uses computer vision to calculate the landing location in real
 - **Real-time Calculation**: Instantly computes mortar landing locations using advanced computer vision.
 - **Dynamic Map Updates**: Displays accurate positions on a responsive map interface.
 - **User-Friendly GUI**: Intuitive and easy-to-use interface built with the Qt framework.
-- **Cross-platform**: Compatible with Windows, macOS, and Linux.
+
 - **Lightweight**: Minimal resource usage ensures smooth operation on most systems.
 
 ![intro](https://github.com/user-attachments/assets/ff5dc5b9-68b3-4ed4-8aa5-26c44fde24e1)
@@ -19,6 +19,7 @@ Easy Squad Mortar uses computer vision to calculate the landing location in real
 
 Ensure you have the following installed on your system:
 - **Python 3.11**
+- **Windows 10 or later**
 
 ## **Installation**
 
